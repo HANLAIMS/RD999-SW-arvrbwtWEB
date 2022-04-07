@@ -12,7 +12,7 @@ services:
     volumes:
       - pg_0_extention:/opt/bitnami/postgresql/share/extension
       - pg_0_data:/bitnami/postgresql
-      - 'c:/ams/postgresql/repmgr_0:/opt/bitnami/repmgr/tmp'
+      - 'd:/arvr/postgresql/repmgr_0:/opt/bitnami/repmgr/tmp'
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=postgres
       - POSTGRESQL_USERNAME=postgres
@@ -69,8 +69,8 @@ volumes:
   #   driver: local
   pg_0_extention:
     driver: local
-  # pg_1_extention:
-  #   driver: local
+#   # pg_1_extention:
+#   #   driver: local
 
 
 # version: '2'
