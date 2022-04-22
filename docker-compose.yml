@@ -16,7 +16,7 @@ services:
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=postgres
       - POSTGRESQL_USERNAME=postgres
-      - POSTGRESQL_PASSWORD=hanla
+      - POSTGRESQL_PASSWORD=hanlaims
       - POSTGRESQL_DATABASE=postgres
       - REPMGR_PASSWORD=repmgr
       - REPMGR_PRIMARY_HOST=pg-0
@@ -24,6 +24,15 @@ services:
       - REPMGR_PARTNER_NODES=pg-0,pg-1
       - REPMGR_NODE_NAME=pg-0
       - REPMGR_NODE_NETWORK_NAME=pg-0
+volumes:
+  pg_0_data:
+    driver: local
+  # pg_1_data:
+  #   driver: local
+  pg_0_extention:
+    driver: local
+  # pg_1_extention:
+  #   driver: local
   # pg-1:
   #   image: bitnami/postgresql-repmgr:13.4.0
   #   ports:
@@ -43,34 +52,34 @@ services:
   #     - REPMGR_PARTNER_NODES=pg-0,pg-1
   #     - REPMGR_NODE_NAME=pg-1
   #     - REPMGR_NODE_NETWORK_NAME=pg-1
-  pgpool:
-    image: bitnami/pgpool:4
-    ports:
-      - 5442:5432
-    environment:
-      - PGPOOL_BACKEND_NODES=0:192.168.0.101:5432,1:192.168.0.102:5432
-      - PGPOOL_SR_CHECK_USER=postgres
-      - PGPOOL_SR_CHECK_PASSWORD=hanla
-      - PGPOOL_SR_CHECK_DATABASE=postgres
-      - PGPOOL_ENABLE_LDAP=no
-      - PGPOOL_POSTGRES_USERNAME=postgres
-      - PGPOOL_POSTGRES_PASSWORD=hanla
-      - PGPOOL_ADMIN_USERNAME=admin
-      - PGPOOL_ADMIN_PASSWORD=adminpassword
-    healthcheck:
-      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
-      interval: 5s
-      timeout: 3s
-      retries: 1
-volumes:
-  pg_0_data:
-    driver: local
-  # pg_1_data:
-  #   driver: local
-  pg_0_extention:
-    driver: local
-#   # pg_1_extention:
+  # pgpool:
+  #   image: bitnami/pgpool:4
+  #   ports:
+  #     - 5442:5432
+  #   environment:
+  #     - PGPOOL_BACKEND_NODES=0:192.168.0.101:5432,1:192.168.0.102:5432
+  #     - PGPOOL_SR_CHECK_USER=postgres
+  #     - PGPOOL_SR_CHECK_PASSWORD=hanla
+  #     - PGPOOL_SR_CHECK_DATABASE=postgres
+  #     - PGPOOL_ENABLE_LDAP=no
+  #     - PGPOOL_POSTGRES_USERNAME=postgres
+  #     - PGPOOL_POSTGRES_PASSWORD=hanla
+  #     - PGPOOL_ADMIN_USERNAME=admin
+  #     - PGPOOL_ADMIN_PASSWORD=adminpassword
+  #   healthcheck:
+  #     test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+  #     interval: 5s
+  #     timeout: 3s
+  #     retries: 1
+# volumes:
+#   pg_0_data:
+#     driver: local
+#   # pg_1_data:
 #   #   driver: local
+#   pg_0_extention:
+#     driver: local
+# #   # pg_1_extention:
+# #   #   driver: local
 
 
 # version: '2'
