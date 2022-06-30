@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="signin">
     <v-row>
       <v-col>
         <img class="IMS__WHITE-01" src="../assets/IMS__WHITE-01.png">
@@ -15,7 +15,7 @@
                   <v-text-field
                       class="form-control" 
                       autofocus
-                      v-model="email"
+                      v-model="account"
                       single-line
                       outlined
                       clearable
@@ -26,15 +26,15 @@
                   ></v-text-field>
               </div>
               <div class ="tfield_pass">
+                <!-- :rules="[rules.required,rules.min]" -->
+                  
                   <v-text-field
                       class="form-control" 
+                      id="passinput"
                       v-model="password"
-                      :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-                      :rules="[rules.required,rules.min]"
-                      :type="showPass ? 'text' : 'password'"
-                      :color="error ? '#f00' : ''"
-                      :hint="hint"
-                      style=";"
+                      :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"                      
+                      :rules="!error=='' ? [rules.emailMatch]:[rules.required,rules.min]"
+                      :type="showPass ? 'text' : 'password'"                      
                       counter
                       outlined
                       solo
@@ -42,6 +42,7 @@
                       clearable
                       label="PASSWORD"
                       @click:append="showPass = !showPass"
+                      @input="error=''"
                       prepend-inner-icon="mdi-key"
                   ></v-text-field>
               </div>      
@@ -59,13 +60,25 @@
                   </v-btn>
               </div>
               <div>
-                  <v-checkbox
-                      v-model="isSave"
-                      label="아이디 저장"
-                      :color="'#213A5B'"
-                      style="margin-top: 0px; margin-left: -3px;"
-                      hide-details
-                      ></v-checkbox>
+                <v-row>
+                  <v-col>
+                    <div>                    
+                      <v-checkbox
+                        v-model="isSave"
+
+                        label="아이디 저장"
+                        :color="'#213A5B'"
+                        style="margin-top: 0px; margin-left: -3px;"
+                        hide-details
+                        ></v-checkbox>
+                      </div>
+                  </v-col>
+                  <v-col>
+                    <div style="margin-top:4px; float:right" >
+                      <router-link to="/register" style="color:#A6ADB4; font-size:small ;">계정 등록하기</router-link>
+                    </div>
+                  </v-col>
+                </v-row>
               </div>
               
               </form>
@@ -79,13 +92,18 @@
 </template>
 
 <script>
+import {auth,setAuthInHeader} from '../api'
+
 export default {
     data () {
       return {
         showPass: false,
-        error: false,
+        account: '',
+        error:'',
         isSave: false,
         email: '',
+        password: '',
+        rPath: '',
         
         hint:'At least 8 characters',
         //password: 'Password',
@@ -96,11 +114,52 @@ export default {
         },
       }
     },
+    computed: {
+      invalidForm() {
+         return !this.account ||!this.password
+      },
+    },
+    watch:{
+      ff(){
+        this.isSave = Boolean()
+      }
+    },
+    created() {
+      this.rPath = this.$route.query.rPath || '/'
+      this.account = localStorage.getItem('account')
+      this.isSave = JSON.parse(localStorage.getItem('issave'))
+    },
+    methods: {
+      onSubmit() {
+        auth.login(this.account, this.password)
+        .then(data => {
+          localStorage.setItem('issave',this.isSave)
+          localStorage.setItem('token',data.accessToken)
+          localStorage.setItem('arvr.name',data.user.name)
+          this.isSave ? localStorage.setItem('account',this.account) : delete localStorage.account
+          setAuthInHeader(data.accessToken)
+          this.$router.push(this.rPath)
+        })
+        .catch(err => {
+          this.error = err.data.error
+          document.getElementById('passinput').focus()
+        })
+          
+      },
+      setItemWithExpireTime(keyName,keyValue,tts) {
+        const obj = {
+          value: keyValue,
+          expire: Date.now() + tts
+        }
+        const objString = JSON.stringify(obj);
+        window.localStorage.setItem(keyName, objString)
+      }
+    }
 }
 </script>
 
 <style>
-.login {
+.signin {
   width: 200vh;
   background-color: #3E88D2;
   background-image: url("../assets/GettyImages-946232676.jpg");

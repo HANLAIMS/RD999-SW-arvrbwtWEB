@@ -5,11 +5,18 @@ import SignIn from '../views/SignIn.vue'
 
 Vue.use(VueRouter)
 
+const requireAuth = (to, from, next) =>{
+  const isAuth = localStorage.getItem('token')
+  const signinPath = `/sign-in?rPath=${encodeURIComponent(to.path)}`
+  isAuth ? next() : next(signinPath)
+}
+
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    beforeEnter: requireAuth
   },
   {
     path: '/about',
