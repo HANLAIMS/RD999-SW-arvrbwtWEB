@@ -62,12 +62,16 @@
               <div>
                 <v-row>
                   <v-col>
-                    <div>                    
+                     <!-- :color="'#213A5B'"             -->
+
+                    <div>        
+                                  
                       <v-checkbox
                         v-model="isSave"
 
                         label="아이디 저장"
-                        :color="'#213A5B'"
+                        color = #213A5B
+                        
                         style="margin-top: 0px; margin-left: -3px;"
                         hide-details
                         ></v-checkbox>
