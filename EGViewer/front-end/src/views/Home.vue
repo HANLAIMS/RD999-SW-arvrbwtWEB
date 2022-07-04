@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <navbar/>
     <div v-if ="loading">
           Loading...
           <v-skeleton-loader
@@ -12,22 +11,20 @@
       indeterminate
       color="red"
     ></v-progress-circular>
-      <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+      <HelloWorld msg="Welcome to Your Vue.js App"/>
     </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Navbar from '@/components/Navbar.vue'
 import {dashboard} from '../api'
-// import HelloWorld from '@/components/HelloWorld.vue'
+import HelloWorld from '@/components/HelloWorld.vue'
 
 export default {
   name: 'Home',
-  components: {
-    Navbar,
-    // HelloWorld
+  components: { 
+    HelloWorld
   },
   data() {
     return {

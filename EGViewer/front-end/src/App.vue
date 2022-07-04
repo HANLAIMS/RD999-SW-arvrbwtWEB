@@ -1,21 +1,23 @@
 <template>
   <v-app>
     <div id="app">
-      <router-view/>
+      <Navbar></Navbar>
     </div>
   </v-app>
 </template>
 
 <script>
-
+import Navbar from './components/Navbar.vue';
 
 export default {
-  name: 'app',
-
-  data () {
-    return {
-    }
-  }
+  components: { Navbar },
+  name: "app",
+  created() {
+    this.$store.state.isSignIn = !!localStorage.getItem('token')
+  },
+  data() {
+      return {};
+  },
 }
 </script>
 
@@ -26,22 +28,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-#v-checkbox{
-
 }
 html, body, #app {
   height: 100%;

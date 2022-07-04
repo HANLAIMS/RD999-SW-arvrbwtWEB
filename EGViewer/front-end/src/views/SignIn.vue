@@ -122,16 +122,15 @@ export default {
       invalidForm() {
          return !this.account ||!this.password
       },
-    },
-    watch:{
-      ff(){
-        this.isSave = Boolean()
+      isSignIn() {
+        return this.$store.state.isSignIn
       }
     },
     created() {
       this.rPath = this.$route.query.rPath || '/'
       this.account = localStorage.getItem('account')
       this.isSave = JSON.parse(localStorage.getItem('issave'))
+      this.$store.state.isSignIn = false
     },
     methods: {
       onSubmit() {
@@ -143,10 +142,12 @@ export default {
           this.isSave ? localStorage.setItem('account',this.account) : delete localStorage.account
           setAuthInHeader(data.accessToken)
           this.$router.push(this.rPath)
+          this.$store.state.isSignIn = true
         })
         .catch(err => {
           this.error = err.data.error
           document.getElementById('passinput').focus()
+          this.$store.state.isSignIn = false
         })
           
       },
