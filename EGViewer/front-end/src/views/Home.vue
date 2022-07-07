@@ -24,7 +24,7 @@
             align="center"
             justify="center"
           >
-            <div class="text-h4" style="background-color:#FFFFFF28; color:white; height: ; margin-left: ;">
+            <div class="text-h4 shadow-text-white" style="background-color:#FFFFFF00; color:white; height: ; margin-left: ;">
               {{ slide.text }} Slide
             </div>
           </v-row>  
@@ -40,25 +40,25 @@
             <v-spacer/>
             <v-col>
               <v-row>
-                <div class="white--text pt-0">주요기능</div>
+                <div class="white--text pt-0 text-h5 shadow-text-white">주요기능</div>
               </v-row>
               <v-row>
                 <router-link to="/about" tag = 'button'>
                   <button>
                     <v-card 
                       class="rounded-vertex"
-                      width="130"
-                      height="130"
+                      width="170"
+                      height="170"
                     >
                       <v-sheet
                         color="#213A5B"
                         height="100%"
                         rounded="true"
                       >
-                        <v-card-text style="color:white">
+                        <v-card-text style="color:white; font-size:large;">
                           호선 별 데이터
                         </v-card-text>
-                        <v-icon size="60" color="white"  align="center" style="margin-top: -5px;">mdi-ferry</v-icon>
+                        <v-icon size="90" color="white"  align="center" style="margin-top: -5px;">mdi-ferry</v-icon>
                         
                       </v-sheet>
                     </v-card>
@@ -71,80 +71,81 @@
             <v-spacer/>
             <v-col>
               <v-row>
-                <div class="white--text pt-0">설치현황</div>
+                <div class="white--text pt-0 text-h5 shadow-text-white">설치현황</div>
               </v-row>
               <v-row>
-                <router-link to="/" tag = 'button'>
-                  <button>
-                    <v-card 
-                      class="rounded-vertex"
-                      width="130"
-                      height="130"
-                      color="#FFFFFF1A"
+                <button>
+                  <v-card 
+                    class="rounded-vertex"
+                    width="170"
+                    height="170"
+                    color="#FFFFFF1A"
+                  >
+                    <v-sheet
+                      color="#213A5B"
+                      height="40%"
+                      rounded="true"
                     >
-                      <v-sheet
-                        color="#213A5B"
-                        height="40%"
-                        rounded="true"
-                      >
-                        <v-card-text style="color:white">
-                          총 설치 척수
-                        </v-card-text>
-
-                        
-                      </v-sheet>
-                      <v-sheet
-                        color="transparent"
-                        height="60%"
-                        rounded="true"
-                      >
-                        <v-card-text style="color:white">
-                          90척
-                        </v-card-text>
-                      </v-sheet>
-                    </v-card>
-                  </button>
-                </router-link>
+                      <v-card-text style="color:white; font-size:large;">
+                        총 설치 척수
+                      </v-card-text>
+                    </v-sheet>
+                    <v-sheet
+                      color="transparent"
+                      height="60%"
+                      rounded="true"
+                    >
+                      <v-card-text style="color:white; font-size:large;">
+                        {{total_result}}척
+                      </v-card-text>
+                    </v-sheet>
+                  </v-card>
+                </button>
               </v-row>
             </v-col>
-            <v-col>
+            <v-spacer/>
+            <div>
               <v-row>
-                <div class="white--text pt-0">연도 별</div>
-              </v-row>
-              <v-row>
-                <router-link to="/" tag = 'button'>
-                  <button>
-                    <v-card 
-                      class="rounded-vertex"
-                      width="520"
-                      height="130"
-                      color="#FFFFFF1A"
-                    >
-                      <v-sheet
-                        color="#213A5B"
-                        height="40%"
-                        rounded="true"
+                <v-col v-for="(annual_result,i) in annual_results"
+                  :key="i"
+                >
+                  <v-row>
+                    <div class=" pt-0 text-h5" style="color:transparent;">연도 별</div>
+                  </v-row>
+                  <v-row>
+                    <button>
+                      <v-card 
+                        class="rounded-vertex"
+                        width="170"
+                        height="170"
+                        color="#FFFFFF1A"
                       >
-                        <v-card-text style="color:white">
-                          총 설치 척수
-                        </v-card-text>
+                        <v-sheet
+                          color="#213A5B"
+                          height="40%"
+                          style="margin:0px;"
+                          rounded="true"
+                        >
+                          <v-card-text style="color:white; font-size:large;">
+                            {{annual_result.year}}년
+                          </v-card-text>
+                        </v-sheet>
 
-                        
-                      </v-sheet>
-                      <v-sheet
-                        color="transparent"
-                        height="60%"
-                        rounded="true"
-                      >
-                        <v-card-text style="color:white">
-                          90척
-                        </v-card-text>
-                      </v-sheet>
-                    </v-card>
-                  </button>
-                </router-link>
+                        <v-sheet
+                          color="transparent"
+                          height="60%"
+                          rounded="true"
+                        >
+                          <v-card-text style="color:white; font-size:large;">
+                            {{annual_result.result}}척
+                          </v-card-text>
+                        </v-sheet>
+                      </v-card>
+                    </button>
+                  </v-row>
+                </v-col>
               </v-row>
-            </v-col>
+            </div>
             <v-spacer/>
             <v-spacer/>
             
@@ -229,6 +230,25 @@ export default {
           text: 'Fourth',
         },   
       ],
+      total_result: 90,
+      annual_results:[
+        {
+          year: '2020',
+          result: 2,
+        },
+        {
+          year: '2021',
+          result: 16,
+        },
+        {
+          year: '2022',
+          result: 54,
+        },
+        {
+          year: '2023',
+          result: 0,
+        },
+      ],
       icons: [
         'mdi-facebook',
         'mdi-twitter',
@@ -261,5 +281,8 @@ export default {
 <style scoped>
 .rounded-vertex{
   border-radius: 0.5rem;
+}
+.shadow-text-white{
+  text-shadow: 0px 0px 5px #00000080;
 }
 </style>
