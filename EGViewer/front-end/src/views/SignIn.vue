@@ -123,7 +123,7 @@ export default {
          return !this.account ||!this.password
       },
       isSignIn() {
-        return this.$store.state.isSignIn
+        return this.$store.state.userStore.isSignIn
       }
     },
     created() {
@@ -131,6 +131,7 @@ export default {
       this.account = localStorage.getItem('account')
       this.isSave = JSON.parse(localStorage.getItem('issave'))
       this.$store.state.isSignIn = false
+      console.log(this.$store.state.userStore.isSignIn)
     },
     methods: {
       onSubmit() {
@@ -138,16 +139,21 @@ export default {
         .then(data => {
           localStorage.setItem('issave',this.isSave)
           localStorage.setItem('token',data.accessToken)
-          localStorage.setItem('arvr.name',data.user.name)
+          //localStorage.setItem('arvr.name',data.user.name)
+          this.$store.commit('UPDATE_USER_INFO',data.user.info)
+          console.log(data.user.info)
+          
           this.isSave ? localStorage.setItem('account',this.account) : delete localStorage.account
           setAuthInHeader(data.accessToken)
           this.$router.push(this.rPath)
-          this.$store.state.isSignIn = true
+          this.$store.commit('UPDATE_SIGN_IN',true)
+          //this.$store.state.userStore.isSignIn = true
         })
         .catch(err => {
           this.error = err.data.error
           document.getElementById('passinput').focus()
-          this.$store.state.isSignIn = false
+          this.$store.commit('UPDATE_SIGN_IN',false)
+          //this.$store.state.isSignIn = false
         })
           
       },

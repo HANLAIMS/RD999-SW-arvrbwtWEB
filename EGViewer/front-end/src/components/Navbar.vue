@@ -7,6 +7,7 @@
         <div v-if = "isSignIn">
           <v-app-bar
             color="#E6E6E6"
+            height = 64px
             elevation="1"
           >
             <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
@@ -17,7 +18,7 @@
             <!-- <router-link to="/">Home</router-link> |
             <router-link to="/about">About</router-link> | -->
             
-            <h4 v-if = "isAuth"><router-link to="/my-page" tag = button><v-icon>mdi-account-circle</v-icon>{{user.fullName}}</router-link>님 반갑습니다.</h4>
+            <h4 v-if = "isAuth"><router-link to="/my-page" tag = button><v-icon>mdi-account-circle</v-icon>{{getUser.fullname}}</router-link>님 반갑습니다.</h4>
             <h4 v-else>세션만료. 로그인 바랍니다.</h4>
             <v-menu
               bottom
@@ -31,8 +32,8 @@
                     x-large
                     v-on="on"
                   >
-                  <v-avatar color="indigo" size = "40">
-                    <span class="white--text text-h5">{{ user.initials }}</span>
+                  <v-avatar :color="getUser.color" size = "40">
+                    <span class="white--text text-h5">{{ getUser.initial }}</span>
                   </v-avatar>
                 </v-btn>
               </template>
@@ -40,14 +41,14 @@
                   <v-list-item-content class="justify-center">
                     <div class="mx-auto text-center">
                       <v-avatar
-                        color="indigo"
+                        :color="getUser.color"
                       >
-                        <span class="white--text text-h5">{{ user.initials }}</span>
+                        <span class="white--text text-h5">{{ getUser.initial }}</span>
                       </v-avatar>
                       
-                      <h3 style="margin-top:10px">{{ user.fullName }}</h3>
+                      <h3 style="margin-top:10px">{{ getUser.fullname }}</h3>
                       <p class="text-caption mt-1">
-                        {{ user.email }}
+                        {{ getUser.email }}
                       </p>
                       <v-divider class="my-3"></v-divider>
                       <router-link to="/my-page" tag = 'button'>
@@ -93,17 +94,19 @@
                     </v-list-item-icon>
                     </router-link>
                     <router-link to="/" tag = 'button'>
+                      <div>
                       <v-list-item-title style="width:max-content">Home</v-list-item-title>
+                      </div>
                     </router-link>
                 </v-list-item>
 
                 <v-list-item>
-                  <router-link to="/about" tag = 'button'>
+                  <router-link to="/ship-list" tag = 'button'>
                     <v-list-item-icon>
                       <v-icon>mdi-chart-line</v-icon>
                     </v-list-item-icon>
                   </router-link>
-                  <router-link to="/about" tag = 'button'>
+                  <router-link to="/ship-list" tag = 'button'>
                     <v-list-item-title>호선 별 데이터</v-list-item-title>
                   </router-link>
                 </v-list-item>
@@ -124,34 +127,35 @@ import RenderingSpace from '../components/RenderingSpace.vue'
 export default {
   data() {
       return {
-        user: {
-        initials: 'CK',
-        fullName: '김 창국',
-        email: 'Changkuk.kim@hanlaims.com',
-        color:'brown',
-        },
         drawer: false,
         group: null,
-        token: false,
       }
   },
   created(){
-    this.user.fullName = localStorage.getItem('arvr.name')
+    console.log("created")
+  },
+  mounted() {
+    console.log("mounted")
   },
   computed:{
     isAuth() {
       return !!localStorage.getItem('token')
     },
     isSignIn() {
-      return this.$store.state.isSignIn
+      return this.$store.state.userStore.isSignIn
+    },
+    getUser(){
+      return JSON.parse(this.$store.state.userStore.userInfo)//localStorage.getItem('arvr.name')//this.$store.state.fullName
     }
   },
   methods: {
     logout() {
+      
       delete localStorage.token
       setAuthInHeader(null)
       this.$router.push('/sign-in')
-      this.$store.state.isSignIn = false
+      this.$store.commit('UPDATE_SIGN_IN',false)
+      //this.$store.state.userStore.isSignIn = false
     },
   },
   components: {

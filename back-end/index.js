@@ -8,7 +8,8 @@ models.sequelize.sync({
   const user = await models.User.create({
     email: 'test@test.com',
     password: '123123',
-    name: '김창국'
+    //name: '{"fullname":"김창국", "initial":"CK", "email":"Changkuk.kim@hanlaims.com", "color":"indigo", "auth":"admin"}',
+    info: '{"fullname":"김창국", "initial":"CK", "email":"Changkuk.kim@hanlaims.com", "color":"indigo", "auth":"admin"}',
   })
   const board = await models.Board.create({
     title: 'Sample Board',

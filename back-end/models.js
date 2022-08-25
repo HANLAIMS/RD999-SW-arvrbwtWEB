@@ -19,7 +19,10 @@ const User = sequelize.define('user', {
   },
   name: {
     type: Sequelize.STRING
-  }
+  },
+  info: {
+    type: Sequelize.STRING
+  },
 })
 
 const Board = sequelize.define('board', {

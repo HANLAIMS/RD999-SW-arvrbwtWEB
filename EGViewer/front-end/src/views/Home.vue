@@ -22,10 +22,10 @@
           <v-row
             class="fill-height"
             align="center"
-            justify="center"
+            justify="start"
+            style="padding-left:250px; padding-bottom: 50px"
           >
-            <div class="text-h4 shadow-text-white" style="background-color:#FFFFFF00; color:white; height: ; margin-left: ;">
-              {{ slide.text }} Slide
+            <div v-html="slide.text" class="text-h4 shadow-text-white">
             </div>
           </v-row>  
         </v-carousel-item>
@@ -43,12 +43,12 @@
                 <div class="white--text pt-0 text-h5 shadow-text-white">주요기능</div>
               </v-row>
               <v-row>
-                <router-link to="/about" tag = 'button'>
+                <router-link to="/ship-list" tag = 'button'>
                   <button>
                     <v-card 
                       class="rounded-vertex"
-                      width="170"
-                      height="170"
+                      width="155"
+                      height="155"
                     >
                       <v-sheet
                         color="#213A5B"
@@ -77,8 +77,8 @@
                 <button>
                   <v-card 
                     class="rounded-vertex"
-                    width="170"
-                    height="170"
+                    width="155"
+                    height="155"
                     color="#FFFFFF1A"
                   >
                     <v-sheet
@@ -86,7 +86,7 @@
                       height="40%"
                       rounded="true"
                     >
-                      <v-card-text style="color:white; font-size:large;">
+                      <v-card-text style="color:white; font-size:large;padding-top:25px">
                         총 설치 척수
                       </v-card-text>
                     </v-sheet>
@@ -95,7 +95,7 @@
                       height="60%"
                       rounded="true"
                     >
-                      <v-card-text style="color:white; font-size:large;">
+                      <v-card-text style="color:white; font-size:large;padding-top:40px">
                         {{total_result}}척
                       </v-card-text>
                     </v-sheet>
@@ -110,14 +110,14 @@
                   :key="i"
                 >
                   <v-row>
-                    <div class=" pt-0 text-h5" style="color:transparent;">연도 별</div>
+                    <div class=" pt-0 text-h5" style="color:transparent;margin-top:32px"></div>
                   </v-row>
                   <v-row>
                     <button>
                       <v-card 
                         class="rounded-vertex"
-                        width="170"
-                        height="170"
+                        width="155"
+                        height="155"
                         color="#FFFFFF1A"
                       >
                         <v-sheet
@@ -126,7 +126,7 @@
                           style="margin:0px;"
                           rounded="true"
                         >
-                          <v-card-text style="color:white; font-size:large;">
+                          <v-card-text style="color:white; font-size:large;padding-top:25px">
                             {{annual_result.year}}년
                           </v-card-text>
                         </v-sheet>
@@ -136,7 +136,7 @@
                           height="60%"
                           rounded="true"
                         >
-                          <v-card-text style="color:white; font-size:large;">
+                          <v-card-text style="color:white; font-size:large;padding-top:40px">
                             {{annual_result.result}}척
                           </v-card-text>
                         </v-sheet>
@@ -167,13 +167,18 @@
           <v-card-text>
             <v-btn
               v-for="icon in icons"
-              :key="icon"
+              :key="icon.shape"
               class="mx-4 white--text"
               icon
             >
-              <v-icon size="24px">
-                {{ icon }}
-              </v-icon>
+              <a :href="icon.link"
+                target='_blank'
+                style="text-decoration:none; color:white"
+              >
+                <v-icon size="24px">
+                  {{ icon.shape }}
+                </v-icon>
+              </a>
             </v-btn>
           </v-card-text>
 
@@ -209,28 +214,28 @@ export default {
         'deep-purple accent-4',
       ],
       slides: [
-        {
-          src: require("../assets/n__2.png"),
-          text: `앞서가는 기업, 도전하는 기업, 세계 최고의 그 날까지 한라IMS는 최선을 다하겠습니다.`,
-        },
+        // {
+        //   src: require("../assets/n__2.png"),
+        //   text: `우리가 만든<br/><b>'세계 유일의 혁신'</b>`,
+        // },
         {
           src: 'https://thumbs.dreamstime.com/b/close-up-large-blue-merchant-crago-ship-middle-ocean-underway-performing-cargo-export-import-operations-close-154776607.jpg',
-          text: 'First',
+          text: `우리가 만든<br/>'세계 유일의 혁신'`,
         },
         {
           src: 'https://thumbs.dreamstime.com/b/panoramic-view-cranes-loading-shipment-containers-cargo-shipping-port-night-banner-size-logistic-industry-concept-import-150170770.jpg',
-          text: 'Second',
-        },
-        {
-          src: 'https://thumbs.dreamstime.com/b/export-import-business-businessmen-handshake-industrial-container-terminal-maritime-transport-logistics-export-209591659.jpg',
-          text: 'Third',
+          text: `그것의 또 다른 말은<br/>'멈추지 않는 도전'이었습니다.`,
         },
         {
           src: 'https://thumbs.dreamstime.com/b/container-ship-carrying-container-import-export-business-logistic-transportation-ship-open-sea-blue-marine-177810567.jpg',
-          text: 'Fourth',
+          text: `앞서가는 기업, 도전하는 기업`,
+        },
+        {
+          src: 'https://thumbs.dreamstime.com/b/export-import-business-businessmen-handshake-industrial-container-terminal-maritime-transport-logistics-export-209591659.jpg',
+          text: `세계 최고의 그 날까지<br/>한라IMS는 최선을 다하겠습니다.`,
         },   
       ],
-      total_result: 90,
+      total_result: 72,
       annual_results:[
         {
           year: '2020',
@@ -250,15 +255,26 @@ export default {
         },
       ],
       icons: [
-        'mdi-facebook',
-        'mdi-twitter',
-        'mdi-linkedin',
-        'mdi-instagram',
+        {
+          shape: 'mdi-twitter',
+          link: 'https://twitter.com/',
+        },
+        {
+          shape: 'mdi-youtube',
+          link: 'https://www.youtube.com/watch?v=xOMuRYuwtec',
+        },
+        {
+          shape: 'mdi-linkedin',
+          link: 'https://www.saramin.co.kr/zf_user/company-info/view?csn=QUQ2bFZ4YkRJejBiMEpaR284Z2pMUT09',
+        },
       ],
     }
   },
   created() {
        this.fetchData()
+  },
+  computed:{
+    
   },
   methods: {
     fetchData() {
@@ -270,6 +286,7 @@ export default {
       dashboard.fetch()
         .then(data => {
           this.dashboardinfo = data
+         
         })
         .finally(()=>{
           this.loading = false
@@ -283,6 +300,8 @@ export default {
   border-radius: 0.5rem;
 }
 .shadow-text-white{
-  text-shadow: 0px 0px 5px #00000080;
+  text-shadow: 0px 10px 10px #00000080;
+  text-align: left;
+  color:white;
 }
 </style>

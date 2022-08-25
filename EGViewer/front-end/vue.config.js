@@ -3,7 +3,7 @@ module.exports = {
     'vuetify'
   ],
   devServer : {
-    disableHostCheck : true,
-    Proxy: 'http://rnd.hanlaims.com:3000'
+    clientLogLevel: 'none',
+    disableHostCheck: true
 }
 }
