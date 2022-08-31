@@ -29,12 +29,17 @@ const routes = [
   {
     path: '/ship-list',
     name: 'ShipList',
-    component: () => import(/* webpackChunkName: "about" */ '../views/ShipList.vue')
+    component: () => import('../views/ShipList.vue')
   },
   {
-    path: '/ship-data',
+    path: '/ship-data/:shipid',
     name: 'ShipData',
-    component: () => import(/* webpackChunkName: "about" */ '../views/ShipData.vue')
+    component: () => import('../views/ShipData.vue'),
+    children: [{
+      path: 'data-view/:viewid',
+      name: 'DataView',
+      component: () => import('../views/DataView.vue'),
+    }]
   },
   {
     path: '/sign-in',
@@ -42,7 +47,7 @@ const routes = [
   },
   {
     path: '*',
-    component: () => import(/* webpackChunkName: "about" */ '../views/NotFound.vue')
+    component: () => import('../views/NotFound.vue')
   }
 ]
 

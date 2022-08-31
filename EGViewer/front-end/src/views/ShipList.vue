@@ -164,12 +164,11 @@
   .v-data-table-header{
     color :aquamarine
   }
-  .mid-headercell{
-            
+  .mid-headercell{            
     background-color: rgb(233, 112, 13);
   }
   .my-card{
-    max-width: 80vw;
+    max-width: 60vw;
   }
   .shiplist{
     background-color: #EDF2FA;
