@@ -224,13 +224,20 @@
       <router-view></router-view>
 
       <v-card-actions>
-        <router-link :to="`/ship-data/${shipid}/data-view/${viewid}`">
+        <router-link :to="`/ship-data/${shipid}/data-view/${viewid}`" tag = 'button'>
           <v-btn
             color="primary lighten-2"
             text
-            @click="ViewDetail"
           >
             View Detail
+          </v-btn>
+        </router-link>
+        <router-link :to="`/ship-list`" tag = 'button'>
+          <v-btn
+            color="primary lighten-2"
+            text
+          >
+            ship list
           </v-btn>
         </router-link>
       </v-card-actions>
@@ -239,6 +246,7 @@
 </template>
 
 <script>
+import {dashboard} from '../api'
 
 export default {
   name: 'ShipData',
@@ -249,6 +257,8 @@ export default {
       dates: [
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       ],
+      apiRes: '',
+      error:'',
       startTime: '00:00',
       endTime: '23:59',
       menu: false,
@@ -317,17 +327,13 @@ export default {
   created() {
     //ref route/index.js
     this.shipid = this.$route.params.shipid
-
+    this.FetchData()
     this.SetViewId()
+    scrollTo(0,0)
   },
   methods:{
     InitViewType(){
       this.viewtype = '';
-    },
-    ViewDetail(){
-      this.loading = true
-      setTimeout(() => (this.loading = false), 2000)
-      //scrollTo(0,0)
     },
     SetViewId(){
       this.viewid = this.selection + ';' + 
@@ -337,6 +343,22 @@ export default {
                     this.startTime + ';' +
                     this.endTime + ';'
     },
+    FetchData(){
+      this.loading = true
+      //setTimeout(() => (this.loading = false), 2000)
+      dashboard.fetch()
+        .then(data => {
+          this.apiRes = data
+          console.log(this.apiRes)
+        })
+        .catch(res=>{
+          this.error = res.response.data
+          console.log(this.error)
+        })
+        .finally(()=>{
+          this.loading = false
+        })
+    }
   },
 }
 </script>

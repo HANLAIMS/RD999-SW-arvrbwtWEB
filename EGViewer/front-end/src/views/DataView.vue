@@ -1,5 +1,8 @@
 <template>
-  <div>DataView:{{viewid}}</div>
+  <div class="dataview">
+    <div v-if="loading">loading...</div>
+    <div>DataView:{{viewid}}</div>
+  </div>
 </template>
 
 <script>
@@ -7,14 +10,24 @@ export default {
   data() {
     return {
       viewid:'',
+      loading: false,
     } 
   },
   created(){
-    this.viewid  = this.$route.params.viewid
+    this.FetchData()
   },
   watch:{
     '$route' () {
-      this.viewid  = this.$route.params.viewid
+      this.FetchData()
+    }
+  },
+  methods: {
+    FetchData() {
+      this.loading = true
+      setTimeout(()=>{
+        this.viewid =  this.$route.params.viewid
+        this.loading = false
+      }, 500)
     }
   },
 

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate'
 import userStore from '@/store/userStore.js'
+import constants from '@/store/constants.js'
 
 Vue.use(Vuex)
 
@@ -10,10 +11,11 @@ const store = new Vuex.Store({
 
   modules: {
       userStore: userStore,
+      constants: constants,
   },
   //vuex plugin 명시
   plugins: [createPersistedState({
-      paths: ["userStore"]
+      paths: ["userStore","constants"]
   })]
 })
 
