@@ -140,8 +140,8 @@ export default {
           localStorage.setItem('issave',this.isSave)
           localStorage.setItem('token',data.accessToken)
           //localStorage.setItem('arvr.name',data.user.name)
-          this.$store.commit('UPDATE_USER_INFO',data.user.info)
-          console.log(data.user.info)
+          this.$store.commit('UPDATE_USER_INFO',JSON.stringify(data.user.info))
+          console.log(JSON.stringify(data.user.info))
           
           this.isSave ? localStorage.setItem('account',this.account) : delete localStorage.account
           setAuthInHeader(data.accessToken)

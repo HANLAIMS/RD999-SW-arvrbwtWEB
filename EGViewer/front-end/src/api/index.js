@@ -34,6 +34,16 @@ export const dashboard = {
 }
 export const auth = {
     login(email,password) {
-        return request('post','/login', {email, password})
+        return request('post','/pg-login', {email, password})
+    }
+}
+export const list = {
+    fetch(email,id) {
+        return id? request('get',`/pg-shiplist/${id}`,{email}) : request('get','/pg-shiplist',{email})
+    }
+}
+export const data = {
+    fetch(id) {
+        return request('get',`/pg-shipdata/${id}`)
     }
 }

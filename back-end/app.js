@@ -9,6 +9,11 @@ const board = require('./api/board')
 const list = require('./api/list')
 const card = require('./api/card')
 
+const test = require('./api/test')
+const pg_auth = require('./api/pg-auth')
+const pg_list = require('./api/pg-shiplist')
+const pg_data = require('./api/pg-shipdata')
+
 const app = express()
 
 app.use(cors())
@@ -17,6 +22,20 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static('public'))
 
+app.post('/test' , test.inputvalue)
+
+app.post('/pg-login' , pg_auth.login)
+
+app.get('/pg-shiplist', authService.ensureAuth(), pg_list.get)
+app.get('/pg-shiplist/:id', authService.ensureAuth(), pg_list.getone)
+
+app.get('/pg-shipdata/:id', pg_data.getTotalOperation)
+app.get('/pg-shipdata-getcol/:id', authService.ensureAuth(), pg_data.getColumnOfMode)
+app.get('/pg-shipdata-opdata/:id', authService.ensureAuth(), pg_data.getOperationOfMode)
+app.get('/pg-shipdata-avgopdata/:id', authService.ensureAuth(), pg_data.getAverageOperationOfMode)
+
+
+// legacy code for lecture-vue-trello
 app.post('/login', auth.login)
 
 app.post('/boards', authService.ensureAuth(), board.create)

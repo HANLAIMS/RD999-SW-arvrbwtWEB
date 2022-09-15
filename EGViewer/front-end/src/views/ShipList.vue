@@ -77,6 +77,8 @@
 </template>
 
 <script>
+  import {list} from '../api'
+  
   export default {
     data () {
       return {
@@ -102,22 +104,16 @@
             owner: '쌍용 C&E',
             delivery: '2022.02.21',
           },
-          {
-            number: 2,
-            name: '단양호',
-            imo: '9121026',
-            owner: '쌍용 C&E',
-            delivery: '2021.02.22',
-          },
-          {
-            number: 2,
-            name: '진양호',
-            imo: '9121025',
-            owner: '쌍용 C&E',
-            delivery: '2021.02.23',
-          },
         ],
         
+      }
+    },
+    created() {
+      this.FetchData()
+    },
+    watch:{
+      '$route' () {
+        this.FetchData()
       }
     },
     computed: {
@@ -147,12 +143,27 @@
           value.toString().indexOf(search) !== -1
       },
       //rowClick(item,row)
-      rowClick(item)
-      {
+      rowClick(item){
         this.selectedUrl = "/ship-data/" + item.imo
         this.$router.push(this.selectedUrl)
         //location.href= this.selectedUrl
       },
+      FetchData(){
+        list.fetch(localStorage.getItem('acoount'))
+        .then(datas => {
+          this.items.splice(0,this.items.length)
+          datas.list.forEach((data,index) => {
+            this.items.push({
+              number: index + 1,
+              name: data.hull_name,
+              imo: data.hull_imo,
+              owner: data.owner_name,
+              delivery: new Date(data.hull_delivery).toLocaleDateString(),
+            })
+          });
+
+        })
+      }
       // getPageCount (itemQty, itemPerPage){
       //   return  ~~(length(items)/itemsPerPage)+((length(items)%itemsPerPage)===0 ? 0:1);
       // }

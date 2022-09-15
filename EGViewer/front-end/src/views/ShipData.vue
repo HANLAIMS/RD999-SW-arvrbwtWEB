@@ -52,7 +52,7 @@
             :key="operation.name"
           >
             <v-list-item-subtitle class="text-left" style="text-transform:uppercase">{{operation.name}}-MODE</v-list-item-subtitle>
-            <v-list-item-subtitle class="text-left" style="color:royalblue">{{operation.value}}</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-left" style="color:royalblue; white-space: pre;">{{operation.value}}</v-list-item-subtitle>
           </v-list-item>
       </v-card-text>
 
@@ -246,7 +246,7 @@
 </template>
 
 <script>
-import {dashboard} from '../api'
+import {list,data} from '../api'
 
 export default {
   name: 'ShipData',
@@ -257,7 +257,6 @@ export default {
       dates: [
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       ],
-      apiRes: '',
       error:'',
       startTime: '00:00',
       endTime: '23:59',
@@ -346,10 +345,25 @@ export default {
     FetchData(){
       this.loading = true
       //setTimeout(() => (this.loading = false), 2000)
-      dashboard.fetch()
+      list.fetch(localStorage.getItem('acoount'),this.shipid)
         .then(data => {
-          this.apiRes = data
-          console.log(this.apiRes)
+          this.params.splice(0,this.params.length)
+          this.params.push({
+              name: "Ship Owner",
+              value: data.data.owner_name
+          })
+          this.params.push({
+              name: "Flag",
+              value: data.data.owner_country
+          })
+          this.params.push({
+              name: "Install Date",
+              value: new Date(data.data.hull_product_installed_date).toLocaleDateString()
+          })
+          this.params.push({
+              name: "Model",
+              value: `${data.data.hull_product}(${data.data.hull_product_ver})`
+          })
         })
         .catch(res=>{
           this.error = res.response.data
@@ -358,6 +372,17 @@ export default {
         .finally(()=>{
           this.loading = false
         })
+      data.fetch(this.shipid)
+        .then(datas => {
+        this.operations.splice(0,this.operations.length)
+        datas.list.forEach((data) => {
+          this.operations.push({
+            name: data.operation_name,
+            value: `${(data.total_operation_duration.days ? data.total_operation_duration.days : 0).toString()} Day ${(data.total_operation_duration.hours ? data.total_operation_duration.hours : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.minutes ? data.total_operation_duration.minutes : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.seconds ? data.total_operation_duration.seconds : 0).toString().padStart(2,'0')} (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
+          })
+        });
+
+      })
     }
   },
 }
