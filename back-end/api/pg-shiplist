@@ -1,6 +1,7 @@
 const models = require('../pgpmodels')
 
 const get = async (req, res) => {
+    const {email} = req.body
     models.db.any(
       `SELECT owner_name,
             owner_country,
@@ -26,6 +27,7 @@ const get = async (req, res) => {
 
 const getone = async (req, res) => {
     const {id} = req.params
+    const {email} = req.body
     models.db.one(
       `SELECT owner_name,
             owner_country,

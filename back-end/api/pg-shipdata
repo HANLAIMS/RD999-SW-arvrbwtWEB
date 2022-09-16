@@ -3,15 +3,16 @@ const models = require('../pgpmodels')
 const getTotalOperation = async (req, res) => {
     const {id} = req.params
     models.db.any(
-      ` select operation_name ,
-            min(operation_start_date),
-            max(operation_end_date),
-            justify_interval(sum(operation_duration)) total_operation_duration
-        from "${id}".da_operation_history
-        group by operation_name 
-        order by (case when operation_name = 'ballast' then 1 
-                        when operation_name = 'deballast' then 2 
-                        when operation_name = 'bypass' then 3 
+      ` select tom.operation_name,
+            min(oh.operation_start_date),
+            max(oh.operation_end_date),
+            justify_interval(sum(oh.operation_duration)) total_operation_duration
+        from public.tb_operation_mode tom
+        left outer join "${id}".da_operation_history oh on oh.operation_name = tom.operation_name
+        group by tom.operation_name
+        order by (case when tom.operation_name = 'ballast' then 1 
+                        when tom.operation_name = 'deballast' then 2 
+                        when tom.operation_name = 'bypass' then 3 
                         else 4 end) asc`
     ).then((datalist) => {
         const list = new Array();
@@ -41,7 +42,8 @@ const getColumnOfMode = async (req, res) => {
         from information_schema."columns" ifsc 
         left outer join "${id}".da_meta_data dmd 
         on ifsc.column_name = dmd.meta_header
-        where ifsc.table_name  = 'da_mode_${opmode}' 
+        where ifsc.table_name  = 'da_mode_${opmode}'
+        and dmd.meta_table = ifsc.table_name  
         and ifsc.table_schema = '${id}'`  
     ).then((datalist) => {
         const list = new Array();

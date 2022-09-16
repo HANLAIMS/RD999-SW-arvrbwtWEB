@@ -39,11 +39,14 @@ export const auth = {
 }
 export const list = {
     fetch(email,id) {
-        return id? request('get',`/pg-shiplist/${id}`,{email}) : request('get','/pg-shiplist',{email})
+        return id? request('post',`/pg-shiplist/${id}`,{email}) : request('post','/pg-shiplist',{email})
     }
 }
 export const data = {
     fetch(id) {
         return request('get',`/pg-shipdata/${id}`)
+    },
+    fetchColumn(id,opmode) {
+        return request('post',`/pg-shipdata-getcol/${id}`,{opmode})
     }
 }

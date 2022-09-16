@@ -149,7 +149,7 @@
         //location.href= this.selectedUrl
       },
       FetchData(){
-        list.fetch(localStorage.getItem('acoount'))
+        list.fetch(localStorage.getItem("account"))
         .then(datas => {
           this.items.splice(0,this.items.length)
           datas.list.forEach((data,index) => {

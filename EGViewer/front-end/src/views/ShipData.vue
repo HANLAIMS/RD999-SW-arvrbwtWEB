@@ -52,7 +52,7 @@
             :key="operation.name"
           >
             <v-list-item-subtitle class="text-left" style="text-transform:uppercase">{{operation.name}}-MODE</v-list-item-subtitle>
-            <v-list-item-subtitle class="text-left" style="color:royalblue; white-space: pre;">{{operation.value}}</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-right" style="color:royalblue; white-space: pre;;">{{operation.value}}</v-list-item-subtitle>
           </v-list-item>
       </v-card-text>
 
@@ -268,6 +268,8 @@ export default {
       selection: 0,
       viewtype:0,
       selectedUrl:'',
+      columns:[],
+      selectedColString:'',
       viewid:'default',
       image:'https://photos.marinetraffic.com/ais/showphoto.aspx?photoid=2597671',
       shipName: 'CHANG YANG',
@@ -335,7 +337,7 @@ export default {
       this.viewtype = '';
     },
     SetViewId(){
-      this.viewid = this.selection + ';' + 
+      this.viewid = this.operations[this.selection].name + ';' + 
                     this.viewtype + ';' + 
                     this.dates[0] + ';' +
                     (this.dates[1]?this.dates[1]:this.dates[0]) + ';' +
@@ -345,7 +347,7 @@ export default {
     FetchData(){
       this.loading = true
       //setTimeout(() => (this.loading = false), 2000)
-      list.fetch(localStorage.getItem('acoount'),this.shipid)
+      list.fetch(localStorage.getItem('account'),this.shipid)
         .then(data => {
           this.params.splice(0,this.params.length)
           this.params.push({
@@ -378,10 +380,23 @@ export default {
         datas.list.forEach((data) => {
           this.operations.push({
             name: data.operation_name,
-            value: `${(data.total_operation_duration.days ? data.total_operation_duration.days : 0).toString()} Day ${(data.total_operation_duration.hours ? data.total_operation_duration.hours : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.minutes ? data.total_operation_duration.minutes : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.seconds ? data.total_operation_duration.seconds : 0).toString().padStart(2,'0')} (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
+            value: `${(data.total_operation_duration.days ? data.total_operation_duration.days : 0).toString()} day ${(data.total_operation_duration.hours ? data.total_operation_duration.hours : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.minutes ? data.total_operation_duration.minutes : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.seconds ? data.total_operation_duration.seconds : 0).toString().padStart(2,'0')}  (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
           })
-        });
-
+        })
+      })
+      .catch(res=>{
+          this.error = res.response.data
+          console.log(this.error)
+      })
+      
+      data.fetchColumn(this.shipid,this.operations[this.selection].name)
+        .then(datas => {
+        this.columns = datas.list;
+        console.log(this.columns)
+      })
+      .catch(res=>{
+          this.error = res.response.data
+          console.log(this.error)
       })
     }
   },
