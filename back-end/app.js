@@ -31,7 +31,7 @@ app.get('/pg-shiplist/:id', authService.ensureAuth(), pg_list.getone)
 app.post('/pg-shiplist/:id', authService.ensureAuth(), pg_list.getone)
 
 app.get('/pg-shipdata/:id', authService.ensureAuth(), pg_data.getTotalOperation)
-app.post('/pg-shipdata-getcol/:id', pg_data.getColumnOfMode)
+app.post('/pg-shipdata-getcol/:id', authService.ensureAuth(), pg_data.getColumnOfMode)
 app.post('/pg-shipdata-opdata/:id', authService.ensureAuth(), pg_data.getOperationOfMode)
 app.post('/pg-shipdata-avgopdata/:id', authService.ensureAuth(), pg_data.getAverageOperationOfMode)
 

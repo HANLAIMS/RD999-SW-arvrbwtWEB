@@ -32,6 +32,7 @@ const getColumnOfMode = async (req, res) => {
     const {opmode} = req.body
     models.db.any(
       ` select ifsc.column_name, 
+                ifsc.data_type,
                 dmd.meta_alias, 
                 dmd.meta_hint, 
                 dmd.meta_minrange, 
@@ -60,12 +61,8 @@ const getColumnOfMode = async (req, res) => {
 const getOperationOfMode = async (req, res) => {
     const {id} = req.params
     const {opmode,columnlist,startdate,enddate} = req.body
-    console.log(` select ${columnlist}
-    from "${id}".da_mode_${opmode}
-    where datetime between '${startdate}' and '${enddate}'
-    order by datetime asc`)
     models.db.any(
-      ` select ${columnlist}
+      ` select datetime ${columnlist}
         from "${id}".da_mode_${opmode}
         where datetime between '${startdate}' and '${enddate}'
         order by datetime asc`
@@ -86,7 +83,7 @@ const getAverageOperationOfMode = async (req, res) => {
     const {id} = req.params
     const {opmode,columnlist,startdate,enddate} = req.body
     models.db.any(
-        ` select ${columnlist}
+        ` select min(datetime) startdate, max(datetime) enddate ${columnlist}
         from "${id}".da_mode_${opmode}
         where datetime between '${startdate}' and '${enddate}'`
     ).then((data) => {
@@ -94,7 +91,7 @@ const getAverageOperationOfMode = async (req, res) => {
     })
     .catch((error) => {
         console.log('ERROR:', error)
-        res.status(401).json({msg: 'Query failure'})
+        res.status(401).json({msg: error})
     })
     
 }

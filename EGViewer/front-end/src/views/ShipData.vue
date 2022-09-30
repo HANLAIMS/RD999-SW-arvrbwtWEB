@@ -17,7 +17,20 @@
         contain
         :src=image
       ></v-img>
-
+      <div v-if="isalert">
+        <v-progress-linear
+          indeterminate
+          color="primary"
+        ></v-progress-linear>
+        <v-alert 
+          border="bottom"
+          colored-border
+          type="warning"
+          elevation="2"
+        >
+        [Warning] If the average value contains elements that cannot be calculated, remove them and request the server.
+        </v-alert>
+      </div>
       <v-list-item two-line>
         <v-list-item-content>
           <v-list-item-title class="text-h5 text-left">{{shipName}}</v-list-item-title>
@@ -81,13 +94,14 @@
               v-model="viewtype"
               active-class="primary accent-4 white--text"
               column
-              v-if="selection!==3"
           >
             <v-icon >mdi-database-eye-outline</v-icon>
             <v-chip style="text-transform:capitalize" label>Sheet</v-chip>
             <v-chip style="text-transform:capitalize" label>Trend line</v-chip>            
             <v-chip style="text-transform:capitalize" label>Average</v-chip>
           </v-chip-group>
+          <v-icon >mdi-filter-settings-outline</v-icon>
+          <v-chip style="text-transform:capitalize" label @click="ClickFilterSet">...</v-chip>
         </v-list-item>
 
         <v-list-item class="my-list-item2">
@@ -103,6 +117,7 @@
           >
             <template v-slot:activator="{ on, attrs }">
               <v-combobox
+                id="datepicker"
                 v-model="dates"
                 multiple
                 chips
@@ -112,6 +127,7 @@
                 readonly
                 v-bind="attrs"
                 v-on="on"
+                @click="MoveScroll(false)"
               ></v-combobox>
             </template>
             <v-date-picker
@@ -153,6 +169,7 @@
                 prepend-icon="mdi-clock-start"
                 v-bind="attrs"
                 v-on="on"
+                @click="MoveScroll(false)"
               ></v-text-field>
             </template>
             <v-time-picker
@@ -194,6 +211,7 @@
                 prepend-icon="mdi-clock-end"
                 v-bind="attrs"
                 v-on="on"
+                @click="MoveScroll(false)"
               ></v-text-field>
             </template>
             <v-time-picker
@@ -221,13 +239,13 @@
         </v-list-item>
       </v-card-text>
 
-      <router-view></router-view>
-
-      <v-card-actions>
-        <router-link :to="`/ship-data/${shipid}/data-view/${viewid}`" tag = 'button'>
+      <!-- <router-view></router-view> -->
+      <v-card-actions id="footerbutton">
+        <router-link :to="`/ship-data/${shipid}/data-view/${viewid}${selectedColString}`" tag = 'button'>
           <v-btn
             color="primary lighten-2"
             text
+            @click="[ShowData(true),isscrollup=true]"
           >
             View Detail
           </v-btn>
@@ -241,26 +259,50 @@
           </v-btn>
         </router-link>
       </v-card-actions>
+
+      <DataView :columns="selectedColumns" :shipid="shipid"></DataView>
+      <v-btn
+        color="primary lighten-2"
+        text
+        v-if="isscrollup"
+        @click="ShowData(false)"
+      >
+        Scroll-up
+      </v-btn>
+
     </v-card>
+    <perfect-scrollbar>
+    <ColumnPicker :columns="columns" :pageid="pageid"
+    v-if ="iscolpick" @close="iscolpick=false" @aplly="FetchColumnList"  ></ColumnPicker>
+    </perfect-scrollbar>
   </div>
 </template>
 
 <script>
 import {list,data} from '../api'
+import ColumnPicker from '../components/ColumnPicker'
+import DataView from './DataView'
 
 export default {
   name: 'ShipData',
   components: {
+    //ES6 부터 key, value의 변수명이 같을때 생략이 가능하다
+    // ColumnPicker : ColumnPicker
+    ColumnPicker,
+    DataView,
   },
   data () {
     return{
       dates: [
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       ],
+      isalert:false,
+      isscrollup:false,
       error:'',
       startTime: '00:00',
       endTime: '23:59',
       menu: false,
+      iscolpick: false,
       startpick: false,
       endpick: false,
       loading: false,
@@ -269,28 +311,17 @@ export default {
       viewtype:0,
       selectedUrl:'',
       columns:[],
+      selectedColumns:[],
       selectedColString:'',
+      pageid:'',
       viewid:'default',
       image:'https://photos.marinetraffic.com/ais/showphoto.aspx?photoid=2597671',
-      shipName: 'CHANG YANG',
+      shipName: '',
       params: [
         {
-          name:"Ship Owner",
-          value:"쌍용E&C",
+          name:"",
+          value:"",
         },
-        {
-          name:"Flag",
-          value:"KR",
-        },
-        {
-          name:"Install Date",
-          value:"2021.08.10",
-        },
-        {
-          name:"Model",
-          value:"EG0500",
-        },
-
       ],
       operations: [
         {
@@ -311,8 +342,10 @@ export default {
   watch:{
     selection(){
       this.SetViewId()
+      this.FetchColumnList()
     },
     viewtype(){
+      this.SetValidAvgCol()
       this.SetViewId()
     },
     dates(){
@@ -333,10 +366,36 @@ export default {
     scrollTo(0,0)
   },
   methods:{
+    MoveScroll(v){
+      document.getElementById("footerbutton").scrollIntoView(v)
+    },
+    ShowData(v){
+      document.getElementById("footerbutton").scrollIntoView(v)
+    },
+    ClickFilterSet(){
+      this.iscolpick = true
+    },
     InitViewType(){
-      this.viewtype = '';
+      this.viewtype = ''
+    },
+    SetValidAvgCol(){
+      this.isalert = true;
+      setTimeout(() => {
+        this.isalert = false;
+      }, 5000);
+
+
+      if (this.viewtype != 0){
+        this.selectedColumns = this.selectedColumns.filter((element)=>element.data_type !== 'text')
+        this.selectedColumns = this.selectedColumns.filter((element)=>element.data_type !== 'boolean')
+      }
     },
     SetViewId(){
+      if (this.dates[0]>this.dates[1] && this.dates[1] != null){
+      //구조분해 할당 문법 = 멀티 SWAP 기능
+        [this.dates[0],this.dates[1]] = [this.dates[1],this.dates[0]]
+      }
+
       this.viewid = this.operations[this.selection].name + ';' + 
                     this.viewtype + ';' + 
                     this.dates[0] + ';' +
@@ -346,17 +405,19 @@ export default {
     },
     FetchData(){
       this.loading = true
+      this.pageid = this.shipid + this.operations[this.selection].name
       //setTimeout(() => (this.loading = false), 2000)
       list.fetch(localStorage.getItem('account'),this.shipid)
         .then(data => {
           this.params.splice(0,this.params.length)
+          this.shipName = data.data.hull_name
           this.params.push({
               name: "Ship Owner",
               value: data.data.owner_name
           })
           this.params.push({
               name: "Flag",
-              value: data.data.owner_country
+              value: data.data.hull_flag
           })
           this.params.push({
               name: "Install Date",
@@ -375,7 +436,7 @@ export default {
           this.loading = false
         })
       data.fetch(this.shipid)
-        .then(datas => {
+      .then(datas => {
         this.operations.splice(0,this.operations.length)
         datas.list.forEach((data) => {
           this.operations.push({
@@ -390,15 +451,32 @@ export default {
       })
       
       data.fetchColumn(this.shipid,this.operations[this.selection].name)
-        .then(datas => {
-        this.columns = datas.list;
-        console.log(this.columns)
+      .then(datas => {
+        this.columns = datas.list
+        this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
       })
       .catch(res=>{
           this.error = res.response.data
           console.log(this.error)
       })
-    }
+    },
+    FetchColumnList(){
+      this.loading = true
+      this.pageid = this.shipid + this.operations[this.selection].name
+      data.fetchColumn(this.shipid,this.operations[this.selection].name)
+      .then(datas => {
+        this.columns = datas.list
+        this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
+        this.selectedColString = ''         
+        this.selectedColumns.forEach((element)=>{
+          this.selectedColString+=`,${element.column_name}`
+        })
+      })
+      .catch(res=>{
+          this.error = res.response.data
+          console.log(this.error)
+      })
+    },
   },
 }
 </script>

@@ -48,5 +48,11 @@ export const data = {
     },
     fetchColumn(id,opmode) {
         return request('post',`/pg-shipdata-getcol/${id}`,{opmode})
+    },
+    fetchRecord(id,opmode,columnlist,startdate,enddate){
+        return request('post',`/pg-shipdata-opdata/${id}`,{opmode,columnlist,startdate,enddate})
+    },
+    fetchAverage(id,opmode,columnlist,startdate,enddate){
+        return request('post',`/pg-shipdata-avgopdata/${id}`,{opmode,columnlist,startdate,enddate})
     }
 }

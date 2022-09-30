@@ -97,13 +97,6 @@
           { text: 'Delivery', align: 'center', sortable: true, value: 'delivery' },
         ],
         items: [
-          {
-            number: 1,
-            name: '창양호',
-            imo: '9121027',
-            owner: '쌍용 C&E',
-            delivery: '2022.02.21',
-          },
         ],
         
       }
@@ -149,6 +142,7 @@
         //location.href= this.selectedUrl
       },
       FetchData(){
+        this.loading = true
         list.fetch(localStorage.getItem("account"))
         .then(datas => {
           this.items.splice(0,this.items.length)
@@ -160,7 +154,8 @@
               owner: data.owner_name,
               delivery: new Date(data.hull_delivery).toLocaleDateString(),
             })
-          });
+            this.loading = false
+          })
 
         })
       }
