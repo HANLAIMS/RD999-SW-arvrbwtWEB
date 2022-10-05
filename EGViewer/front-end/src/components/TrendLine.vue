@@ -71,23 +71,33 @@
 
 				<v-card>
 					<v-card-title>
-						<span class="text-h5">Detail Chart</span>
+						<span class="text-h5">Detail Chart (작업중)</span>
 					</v-card-title>
 					<v-card-text>
 						<v-sheet color="rgba(0, 0, 0, .12)">
-							<TrendChart
-								:datasets="datasets"
-								:grid="grid"
-								:labels="labels"
-								:min="0"
-							/>
-							
-							<v-skeleton-loader
+							<div class="bitcoin-price">
+								<svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+									<defs>
+										<linearGradient id="btcFill" x1="1" x2="1" y1="0" y2="1">
+										<stop offset="0%" stop-color="#f69119"></stop>
+										<stop offset="100%" stop-color="#ffffff"></stop>
+										</linearGradient>
+									</defs>
+								</svg>
+								<TrendChart
+									:datasets="datasets"
+									:grid="grid"
+									:labels="labels"
+									:min="0"
+								/>
+							</div>
+							<!-- <v-skeleton-loader
 								class="mx-auto"
 								max-width="300"
 								type="card"
 							>
-							</v-skeleton-loader>
+							
+							</v-skeleton-loader> -->
 						</v-sheet>
 					</v-card-text>
 					<v-card-actions>
