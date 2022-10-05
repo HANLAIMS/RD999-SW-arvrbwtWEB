@@ -34,7 +34,7 @@ const AVERG = 2
 import {data} from '../api'
 import SpreadSheet from '../components/SpreadSheet'
 import Average from '../components/Average'
-import TrendLine from '../components/TrendLine.vue'
+import TrendLine from '../components/TrendLine'
 
 export default {
   name: 'DataView',
@@ -79,7 +79,8 @@ export default {
         this.startTime = `${words[2]} ${words[4]}`
         this.endTime = `${words[3]} ${words[5]}`
 
-        this.keyData = JSON.parse(localStorage.getItem(this.shipid+this.mode))
+        this.keyData = this.columns
+        this.queryData = null
 
         switch(parseInt(this.view)){
           case SHEET:
@@ -92,7 +93,6 @@ export default {
             data.fetchRecord(this.shipid,this.mode,this.columsString,this.startTime,this.endTime)
             .then(data => {
               this.queryData = data
-              console.log(this.queryData)
             })
             .catch(res=>{
               this.error = res.response.data
@@ -108,7 +108,6 @@ export default {
             data.fetchAverage(this.shipid,this.mode,this.columsString,this.startTime,this.endTime)
             .then(data => {
               this.queryData = data
-              console.log(this.queryData)
             })
             .catch(res=>{
               this.error = res.response.data
@@ -118,8 +117,6 @@ export default {
           default:
             break
         }
-        //지워!!
-        //console.log(this.mode+this.view+this.startTime+this.endTime+this.colums)
         this.loading = false
       }, 500)
     }

@@ -56,18 +56,57 @@
 							<v-btn
 								block
 								text
+								@click="openDialog"
 							>
 								Go to detail
 							</v-btn>
 						</v-card-actions>
 					</v-card>
 				</v-col>
-				
 			</v-row>
+			<v-dialog
+				v-model="dialog"
+				width="600px"
+			>
+
+				<v-card>
+					<v-card-title>
+						<span class="text-h5">Detail Chart</span>
+					</v-card-title>
+					<v-card-text>
+						<v-sheet color="rgba(0, 0, 0, .12)">
+							<TrendChart
+								:datasets="datasets"
+								:grid="grid"
+								:labels="labels"
+								:min="0"
+							/>
+							
+							<v-skeleton-loader
+								class="mx-auto"
+								max-width="300"
+								type="card"
+							>
+							</v-skeleton-loader>
+						</v-sheet>
+					</v-card-text>
+					<v-card-actions>
+						<v-spacer></v-spacer>
+						<v-btn
+							color="primary"
+							text
+							@click="dialog = false"
+						>
+							Close
+						</v-btn>
+					</v-card-actions>
+				</v-card>
+			</v-dialog>
     </div>
   </template>
   
   <script>
+
   export default {
     name: 'trendline',
     props:{
@@ -77,6 +116,7 @@
     data() {
       return {
 				loading :false,
+				dialog :false,
         rowcount : 0,
 				selectedItem:{name:'View 2 per line',value:6},
 				items: [
@@ -129,10 +169,23 @@
 					],
 					label:[]
 				},
-
+				datasets:[
+					{
+						data: [10, 50, 20, 100, 40, 60, 80],
+						smooth: true,
+						fill: true
+					}
+				],
+				grid:{
+					verticalLines: true,
+					horizontalLines: true
+				},
+				labels:{
+					xLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+					yLabels: 5
+				},
 				
-				
-      };
+      }
     },
     components: {
     },
@@ -153,6 +206,10 @@
     mounted() {
     },
     methods: {
+			openDialog(){
+				this.dialog = true
+				console.log(this.dialog)
+			},
 			setValue() {
         this.columns.name.splice(0,this.columns.name.length)
 				this.columns.value.splice(0,this.columns.value.length)

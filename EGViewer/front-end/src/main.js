@@ -6,11 +6,13 @@ import store from './store'
 import VueCookies from "vue-cookies"
 import PerfectScrollbar from 'vue2-perfect-scrollbar'
 import 'vue2-perfect-scrollbar/dist/vue2-perfect-scrollbar.css'
+import TrendChart from "vue-trend-chart"
 
 Vue.config.productionTip = false
-Vue.use(VueCookies);
+Vue.use(VueCookies)
 Vue.use(PerfectScrollbar)
-Vue.$cookies.config("7d");
+Vue.use(TrendChart)
+Vue.$cookies.config("7d")
 
 new Vue({
   vuetify,

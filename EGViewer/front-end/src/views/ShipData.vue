@@ -379,15 +379,18 @@ export default {
       this.viewtype = ''
     },
     SetValidAvgCol(){
-      this.isalert = true;
-      setTimeout(() => {
-        this.isalert = false;
-      }, 5000);
-
-
+      
       if (this.viewtype != 0){
+        this.isalert = true;
+        setTimeout(() => {
+          this.isalert = false;
+        }, 5000);
+
         this.selectedColumns = this.selectedColumns.filter((element)=>element.data_type !== 'text')
         this.selectedColumns = this.selectedColumns.filter((element)=>element.data_type !== 'boolean')
+      }
+      else{
+        this.FetchColumnList()
       }
     },
     SetViewId(){
@@ -454,6 +457,11 @@ export default {
       .then(datas => {
         this.columns = datas.list
         this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
+
+        this.selectedColString = ''         
+        this.selectedColumns.forEach((element)=>{
+          this.selectedColString+=`,${element.column_name}`
+        })
       })
       .catch(res=>{
           this.error = res.response.data
@@ -463,10 +471,12 @@ export default {
     FetchColumnList(){
       this.loading = true
       this.pageid = this.shipid + this.operations[this.selection].name
+ 
       data.fetchColumn(this.shipid,this.operations[this.selection].name)
       .then(datas => {
         this.columns = datas.list
         this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
+        
         this.selectedColString = ''         
         this.selectedColumns.forEach((element)=>{
           this.selectedColString+=`,${element.column_name}`
