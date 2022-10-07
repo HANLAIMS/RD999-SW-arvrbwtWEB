@@ -82,10 +82,10 @@
           >
             <v-icon>mdi-ship-wheel</v-icon>
             <div 
-              v-for="operation in operations"
-              :key="operation.name"
+              v-for="opmode in opmodes"
+              :key="opmode.name"
             >
-              <v-chip style="text-transform:capitalize" label>{{operation.name}}</v-chip>
+              <v-chip style="text-transform:capitalize" label>{{opmode.name}}</v-chip>
             </div>
             <v-chip @click="InitViewType" style="text-transform:capitalize" label >Alarm</v-chip>
           </v-chip-group>
@@ -323,6 +323,17 @@ export default {
           value:"",
         },
       ],
+      opmodes:[
+        {
+          name:"ballast",
+        },
+        {
+          name:"deballast",
+        },
+        {
+          name:"bypass",
+        },
+      ],
       operations: [
         {
           name:"ballast",
@@ -399,7 +410,7 @@ export default {
         [this.dates[0],this.dates[1]] = [this.dates[1],this.dates[0]]
       }
 
-      this.viewid = this.operations[this.selection].name + ';' + 
+      this.viewid = this.opmodes[this.selection].name + ';' + 
                     this.viewtype + ';' + 
                     this.dates[0] + ';' +
                     (this.dates[1]?this.dates[1]:this.dates[0]) + ';' +
@@ -408,7 +419,7 @@ export default {
     },
     FetchData(){
       this.loading = true
-      this.pageid = this.shipid + this.operations[this.selection].name
+      this.pageid = this.shipid + this.opmodes[this.selection].name
       //setTimeout(() => (this.loading = false), 2000)
       list.fetch(localStorage.getItem('account'),this.shipid)
         .then(data => {
@@ -442,18 +453,20 @@ export default {
       .then(datas => {
         this.operations.splice(0,this.operations.length)
         datas.list.forEach((data) => {
+          console.log(data)
           this.operations.push({
             name: data.operation_name,
-            value: `${(data.total_operation_duration.days ? data.total_operation_duration.days : 0).toString()} day ${(data.total_operation_duration.hours ? data.total_operation_duration.hours : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.minutes ? data.total_operation_duration.minutes : 0).toString().padStart(2,'0')} :${(data.total_operation_duration.seconds ? data.total_operation_duration.seconds : 0).toString().padStart(2,'0')}  (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
+            value: `${(data.total_operation_duration ? (data.total_operation_duration.days? data.total_operation_duration.days:0) : 0).toString()} day ${(data.total_operation_duration ? (data.total_operation_duration.hours? data.total_operation_duration.hours:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.minutes? data.total_operation_duration.minutes:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.seconds? data.total_operation_duration.seconds:0) : 0).toString().padStart(2,'0')}  (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
           })
         })
+        
       })
       .catch(res=>{
           this.error = res.response.data
           console.log(this.error)
       })
       
-      data.fetchColumn(this.shipid,this.operations[this.selection].name)
+      data.fetchColumn(this.shipid,this.opmodes[this.selection].name)
       .then(datas => {
         this.columns = datas.list
         this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
@@ -470,9 +483,9 @@ export default {
     },
     FetchColumnList(){
       this.loading = true
-      this.pageid = this.shipid + this.operations[this.selection].name
+      this.pageid = this.shipid + this.opmodes[this.selection].name
  
-      data.fetchColumn(this.shipid,this.operations[this.selection].name)
+      data.fetchColumn(this.shipid,this.opmodes[this.selection].name)
       .then(datas => {
         this.columns = datas.list
         this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns

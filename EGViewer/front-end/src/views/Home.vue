@@ -219,19 +219,19 @@ export default {
         //   text: `우리가 만든<br/><b>'세계 유일의 혁신'</b>`,
         // },
         {
-          src: 'https://thumbs.dreamstime.com/b/close-up-large-blue-merchant-crago-ship-middle-ocean-underway-performing-cargo-export-import-operations-close-154776607.jpg',
+          src: require("../assets/GettyImages-1297382768.jpg"),
           text: `우리가 만든<br/>'세계 유일의 혁신'`,
         },
         {
-          src: 'https://thumbs.dreamstime.com/b/panoramic-view-cranes-loading-shipment-containers-cargo-shipping-port-night-banner-size-logistic-industry-concept-import-150170770.jpg',
+          src: require("../assets/GettyImages-1170018679.jpg"),
           text: `그것의 또 다른 말은<br/>'멈추지 않는 도전'이었습니다.`,
         },
         {
-          src: 'https://thumbs.dreamstime.com/b/container-ship-carrying-container-import-export-business-logistic-transportation-ship-open-sea-blue-marine-177810567.jpg',
+          src: require("../assets/GettyImages-jv11291212.jpg"),
           text: `앞서가는 기업, 도전하는 기업`,
         },
         {
-          src: 'https://thumbs.dreamstime.com/b/export-import-business-businessmen-handshake-industrial-container-terminal-maritime-transport-logistics-export-209591659.jpg',
+          src: require("../assets/GettyImages-1339057752.jpg"),
           text: `세계 최고의 그 날까지<br/>한라IMS는 최선을 다하겠습니다.`,
         },   
       ],
