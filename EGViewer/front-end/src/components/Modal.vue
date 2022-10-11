@@ -37,7 +37,7 @@ export default {
 
 <style>
     #app {
-  padding: 1rem;
+  /* padding: 1rem; */
 }
 
 .modal-mask {

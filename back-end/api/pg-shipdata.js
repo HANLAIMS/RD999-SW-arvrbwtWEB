@@ -9,6 +9,7 @@ const getTotalOperation = async (req, res) => {
             justify_interval(sum(oh.operation_duration)) total_operation_duration
         from public.tb_operation_mode tom
         left outer join "${id}".da_operation_history oh on oh.operation_name = tom.operation_name
+        where operation_target_schema = '${id}'
         group by tom.operation_name
         order by (case when tom.operation_name = 'ballast' then 1 
                         when tom.operation_name = 'deballast' then 2 

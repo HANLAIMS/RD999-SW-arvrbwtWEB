@@ -1,360 +1,358 @@
 <template>
-  <div id="app">
-    <vue-table
-      v-model="products"
-      :headers="headers"
-      :custom-options="customOptions"
-      :style-wrap-vue-table="styleWrapVueTable"
-      :disable-cells="disableCells"
-      :disable-sort-thead="disableSortThead"
-      :loading="loading"
-      :parent-scroll-element="parentScrollElement"
-      :select-position="selectPosition"
-      :submenu-tbody="submenuTbody"
-      :submenu-thead="submenuThead"
-      @tbody-change-data="changeData"
-      @tbody-submenu-click-change-color="changeColorTbody"
-      @tbody-submenu-click-change-value="changeValueTbody"
-      @thead-submenu-click-change-color="changeColorThead"
-      @thead-submenu-click-change-value="changeValueThead"
-      @thead-td-sort="sortProduct">
-    <div slot="header">
-      Specific Header
+  <Modal>
+    <div slot="header" style="height:0px">
     </div>
-    <div slot="loader">
-      Loader
+    <div slot="body">
+      <form id="column-picker-form"
+        @submit.prevent = pickColumn>
+        
+        <v-card
+          class="mx-auto"
+          max-width="100vw"
+        >
+          <v-toolbar
+            flat
+            color="transparent"
+          >
+            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-toolbar-title>Filter Setting {{pageid}}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+              icon
+              @click="$refs.search.focus()"
+            >
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              @click="close"
+            >
+              <v-icon>mdi-close-circle-outline</v-icon>
+            </v-btn>
+          </v-toolbar>
+
+          <v-container class="py-0" style="margin-bottom:20px; margin-top:20px;">
+            <v-row
+              align="center"
+              justify="start"
+              style="padding-right: 15px;"
+            >
+              <v-col
+                v-for="(selection, i) in selections"
+                :key="selection.text"
+                class="shrink"
+                style="margin-right:-20px; margin-top: -20px;"
+              >
+                <v-chip
+                  class ="handle"
+                  :disabled="loading"
+                  close
+                  color="primary"
+                  small
+                  draggable
+                  @click:close="pull(i)"
+                  @dragstart="getDrag(i)"
+                  @dragover="getTarget(i)"
+                  @dragend="swapLocation(targetIndex,pickingIndex)"
+                >
+                  <!-- <v-icon
+                    left
+                    v-text="`mdi-tag-outline`"
+                  ></v-icon> -->
+                  {{ selection.meta_alias }}
+                </v-chip>
+              </v-col>
+
+              <!-- <v-col
+                v-if="!allSelected"
+                cols="12"
+              > -->
+              <v-col
+                cols="12"
+              >
+                <v-text-field
+                  ref="search"
+                  v-model="search"
+                  full-width
+                  hide-details
+                  label="Search"
+                  single-line
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+
+          <v-divider></v-divider>
+
+          <v-list>
+            <v-virtual-scroll
+              :items="categories"
+              height="300"
+              item-height="64"
+              bench = 1
+            >
+              <template v-slot:default="{ item }">
+                <v-divider></v-divider>
+                  <v-list-item
+                    :key="item.column_name"
+                    :disabled="loading"
+                    @click="distinctPush(item)"
+                  >
+                    <v-list-item-action>
+                      <v-btn v-if="!selected.includes(item)" 
+                        fab
+                        small
+                        depressed
+                        color="primary"
+                      >
+                      <v-icon
+                            :disabled="loading"
+                            v-text="`mdi-tag-plus`"
+                        ></v-icon>
+                      </v-btn>
+                      <v-btn v-else
+                        fab
+                        small
+                        depressed
+                        color="gray"
+                      >
+                      <v-icon
+                            :disabled="loading"
+                            v-text="`mdi-tag-plus`"
+                        ></v-icon>
+                      </v-btn>
+                    </v-list-item-action>
+
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        <v-spacer></v-spacer><strong>{{ item.meta_alias }}</strong>
+                      </v-list-item-title>
+                    </v-list-item-content>
+
+                    <v-list-item-action>
+                      <v-tooltip left>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-icon 
+                            
+                            v-bind="attrs"
+                            v-on="on"
+                            @mouseover="showHint(item,true)" 
+                            @mouseleave="showHint(item,false)"
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </template>
+                        <span>
+                          <div class="hint">Hint: {{hint.meta_hint}}</div><br/> 
+                          <div class="hint">Scale: {{hint.meta_scale}}</div><br/>
+                          <div class="hint">Unit: {{hint.meta_unit}}</div><br/>
+                          <div class="hint">Range: {{hint.meta_minrange}} ~ {{hint.meta_maxrange}}</div><br/>
+                          <div class="hint">Type: {{hint.data_type}}</div>
+                        </span>
+                      </v-tooltip>
+                    </v-list-item-action>
+                  </v-list-item>
+            
+                </template>
+            </v-virtual-scroll>
+          </v-list>
+
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <!-- <v-btn
+              :disabled="!selected.length"
+              :loading="loading"
+              color="purple"
+              text
+              @click="next"
+            >
+              Next
+            </v-btn> -->
+          </v-card-actions>
+        </v-card>
+        <!-- <input class="form-control" type="text" v-model="input" ref="input"> -->
+      </form>
     </div>
-    </vue-table>
-  </div>
+    <div slot="footer">
+      <v-btn class="btn" :class="{'btn-success':valid}" type="submit" color="primary"
+        form="column-picker-form" :disabled="!valid">Aplly</v-btn>
+    </div>
+  </Modal>
 </template>
 
 <script>
+    import Modal from './Modal'
+    export default {
+      name: 'ColumnPicker',
+      props : {
+        columns : Array,
+        pageid : String,
+      },
+      created(){
+        const storedItems = JSON.parse(localStorage.getItem(this.pageid))?JSON.parse(localStorage.getItem(this.pageid)):this.columns;
+        storedItems.forEach((storedItem) =>{
+          const columnItem = this.columns.find(v=>v.column_name === storedItem.column_name)
+          this.selected.push(columnItem)
+        })
 
-import VueTable from 'vuejs-spreadsheet';
+        this.input = ''
+        this.selected.forEach(element => {
+          this.input += `,${element.column_name}`
+        });
+      },
+      components:{
+        Modal,
+      },
+      data: () => ({
+        items: [
+          {
+            text: 'Nature',
+            icon: 'mdi-nature',
+          },
+          {
+            text: 'Nightlife',
+            icon: 'mdi-glass-wine',
+          },
+          {
+            text: 'November',
+            icon: 'mdi-calendar-range',
+          },
+          {
+            text: 'Portland',
+            icon: 'mdi-map-marker',
+          },
+          {
+            text: 'Biking',
+            icon: 'mdi-bike',
+          },
+        ],
+        loading: false,
+        valid: false,
+        search: '',
+        selected: [],
+        input: '',
+        hint:[],
+        isHint:false,
+        isDrag:false,
+        pickingIndex:0,
+        targetIndex:0,
+      }),
+  
+      computed: {
+        allSelected () {
+          return this.selected.length === this.columns.length
+        },
+        categories () {
+          const search = this.search.toLowerCase()
+  
+          if (!search) return this.columns
+  
+          return this.columns.filter(item => {
+            const text = item.column_name.toLowerCase()
+  
+            return text.indexOf(search) > -1
+          })
+        },
+        selections () {
+          const selections = []
+  
+          for (const selection of this.selected) {
+            selections.push(selection)
+          }
+  
+          return selections
+        },
+      },
+  
+      watch: {
+        selected () {
+          this.search = ''
+        },
+        input (v) {
+          this.valid = v.trim().length > 0
+        },
+        selectedColumns() {
+          
+        }
+      },
+  
+      methods: {
+        next () {
+          this.loading = true
+  
+          setTimeout(() => {
+            this.search = ''
+            this.selected = []
+            this.loading = false
+          }, 2000)
+        },
+        pickColumn() {
+          localStorage.setItem(this.pageid,JSON.stringify(this.selected));
+          this.$emit('aplly')
+          this.$emit('close')
+        },
+        close() {
+          this.$emit('close')
+        },
+        distinctPush(v) {
+          if (!this.selected.includes(v)) {
+            this.selected.push(v)
 
-export default {
-  name: 'app',
-  data() {
-    return {
-      customOptions: {
-        tbodyIndex: true,
-        sortHeader: true,
-        trad: {
-          lang: 'fr',
-          en: {
-            select: {
-              placeholder: 'Search by typing',
-            },
-          },
-          fr: {
-            select: {
-              placeholder: 'Taper pour chercher',
-            },
-          },
+            this.input = '';
+            this.selected.forEach(element => {
+              this.input += `,${element.column_name}`
+            });
+            
+          }
         },
-        newData: {
-          type: 'input',
-          value: '',
-          active: false,
-          style: {
-            color: '#000',
-          },
+        pull(v){
+          this.selected.splice(v, 1)
+          this.input = '';
+          this.selected.forEach(element => {
+            this.input += `,${element.column_name}`
+          });
         },
-        fuseOptions: {
-          shouldSort: true,
-          threshold: 0.2,
-          location: 0,
-          distance: 30,
-          maxPatternLength: 64,
-          minMatchCharLength: 1,
-          findAllMatches: false,
-          tokenize: false,
-          keys: [
-            'value',
-          ],
+        showHint(v,b) {
+          this.hint = v
+          this.isHint = b
         },
-      },
-      submenuTbody: [
+        getDrag(v){
+          this.pickingIndex = v
+          this.isDrag = true
+        },
+        getTarget(v){
+          this.targetIndex = v
+        },
+        swapLocation(target,picked)
         {
-          type: 'button',
-          value: 'change color',
-          function: 'change-color',
-          disabled: ['img'],
-        },
-        {
-          type: 'button',
-          value: 'change value',
-          function: 'change-value',
-          disabled: ['img', 'name'],
-        },
-      ],
-      submenuThead: [
-        {
-          type: 'button',
-          value: 'change color',
-          function: 'change-color',
-          disabled: ['a'],
-        },
-        {
-          type: 'select',
-          disabled: ['a'],
-          subtitle: 'Select state:',
-          selectOptions: [
-            {
-              value: 'new-york',
-              label: 'new-york',
-            },
-            {
-              value: 'france',
-              label: 'france',
-            },
-          ],
-          value: 'new-york',
-          buttonOption: {
-            value: 'change city',
-            function: 'change-city',
-            style: {
-              display: 'block',
-            },
-          },
-        },
-        {
-          type: 'button',
-          value: 'change value',
-          function: 'change-value',
-          disabled: ['a', 'b'],
-        },
-      ],
-      disableCells: ['a'],
-      loading: false,
-      parentScrollElement: {
-        attribute: 'html',
-        positionTop: 0,
-      },
-      selectPosition: {
-        top: 0,
-        left: 0,
-      },
-      disableSortThead: ['a'],
-      styleWrapVueTable: {
-        fontSize: '12px',
-        comment: {
-          borderColor: '#696969',
-          borderSize: '8px',
-          widthBox: '120px',
-          heightBox: '80px',
-        },
-      },
-      headers: [
-        {
-          headerName: 'A',
-          headerKey: 'a',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'B',
-          headerKey: 'b',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'C',
-          headerKey: 'c',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'D',
-          headerKey: 'd',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'E',
-          headerKey: 'e',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'F',
-          headerKey: 'f',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-        {
-          headerName: 'G',
-          headerKey: 'g',
-          style: {
-            width: '200px',
-            minWidth: '200px',
-            color: '#000',
-          },
-        },
-      ],
-      products: [
-        {
-          a: {
-            type: 'img',
-            value: 'https://via.placeholder.com/350x150',
-            active: false,
-          },
-          c: {
-            type: 'input',
-            value: 'Paris',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          },
-          d: {
-            type: 'input',
-            value: 'France',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          },
-          e: {
-            type: 'input',
-            value: 'Boe',
-            active: false,
-            style: {
-              color: '#000',
-            },
-          },
-          f: {
-            type: 'select',
-            handleSearch: true,
-            selectOptions: [
-              {
-                value: 'Harry Potter',
-                label: 'harry potter',
-              },
-              {
-                value: 'Hermione Granger',
-                label: 'hermione granger',
-              },
-              {
-                value: 'Ron Whisley',
-                label: 'ron whisley',
-              },
-              {
-                value: 'Dobby',
-                label: 'dobby',
-              },
-              {
-                value: 'Hagrid',
-                label: 'hagrid',
-              },
-              {
-                value: 'Professeur Rogue',
-                label: 'professeur rogue',
-              },
-              {
-                value: 'Professeur Mcgonagal',
-                label: 'professeur mcgonagal',
-              },
-              {
-                value: 'Professeur Dumbledor',
-                label: 'professeur dumbledor',
-              },
-            ],
-            value: 'professeur dumbledor',
-            active: false,
-          },
-          g: {
-            type: 'select',
-            handleSearch: true,
-            selectOptions: [
-              {
-                value: 1980,
-                label: 1980,
-              },
-              {
-                value: 1981,
-                label: 1981,
-              },
-              {
-                value: 1982,
-                label: 1982,
-              },
-              {
-                value: 1983,
-                label: 1983,
-                active: true,
-              },
-              {
-                value: 1984,
-                label: 1984,
-              },
-            ],
-            value: 1983,
-            active: false,
-          },
-        },
-      ],
-    };
-  },
-  components: {
-    VueTable,
-  },
-  mounted() {
-    this.loading = true;
-    setTimeout(() => {
-      this.loading = false;
-    }, 300);
-  },
-  methods: {
-    changeData(row, header) {
-      console.log(row, header);
-    },
-    sortProduct(event, header, colIndex) {
-      console.log('sort product');
-    },
-    // callback
-    changeColorThead(event, header, colIndex) {
-      this.headers[colIndex].style.color = '#e40000';
-    },
-    changeColorTbody(event, header, rowIndex, colIndex) {
-      this.products[rowIndex][header].style = {};
-      this.products[rowIndex][header].style.color = '#e40000';
-    },
-    changeValueTbody(event, header, rowIndex, colIndex) {
-      this.products[rowIndex][header].value = 'T-shirt';
-    },
-    changeValueThead(event, entry, colIndex) {
-      this.headers[colIndex].headerName = 'T-shirt';
-    },
-  },
-};
-</script>
+          if (target < picked){
+            this.selected.splice(target, 0,this.selected[picked])
+            this.selected.splice(picked + 1, 1)
+          }
+          else{
+            this.selected.splice(target + 1, 0,this.selected[picked])
+            this.selected.splice(picked, 1)
+          }
 
-<style lang="scss">
-::-moz-selection {
-  color: #2c3e50;
-  background: transparent;
-}
-::selection {
-  color: #2c3e50;
-  background: transparent;
-}
+          this.isDrag = false
+
+          this.input = '';
+          this.selected.forEach(element => {
+            this.input += `,${element.column_name}`
+          })
+        },
+      },
+    }
+  </script>
+
+<style scoped>
+  .hint{
+    float:left
+  }
+  .handle{
+    cursor:move
+  }
+
 </style>
