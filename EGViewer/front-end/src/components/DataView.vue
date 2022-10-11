@@ -15,7 +15,7 @@
       
       <div v-if="view==1">
         <div><h3><h3 style="text-transform : uppercase;">{{mode}}</h3> Trend</h3></div>
-        <TrendLine :queryData="queryData" :keyData="keyData"></TrendLine>
+        <TrendLine :queryData="queryData" :keyData="keyData" @openDetailTrend="openDetailTrend"></TrendLine>
       </div>
       
       <div v-if="view==2">
@@ -69,6 +69,9 @@ export default {
     },
   },
   methods: {
+    openDetailTrend(){
+      this.$emit('openDetailTrend')
+    },
     FetchData() {
       this.loading = true
       setTimeout(()=>{

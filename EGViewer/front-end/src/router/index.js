@@ -38,7 +38,7 @@ const routes = [
     children: [{
       path: 'data-view/:viewid',
       name: 'DataView',
-      component: () => import('../views/DataView.vue'),
+      component: () => import('../components/DataView.vue'),
     }]
   },
   {

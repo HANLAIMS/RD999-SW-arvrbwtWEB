@@ -260,7 +260,7 @@
         </router-link>
       </v-card-actions>
 
-      <DataView :columns="selectedColumns" :shipid="shipid"></DataView>
+      <DataView :columns="selectedColumns" :shipid="shipid" @openDetailTrend="openDetailTrend"></DataView>
       <v-btn
         color="primary lighten-2"
         text
@@ -275,13 +275,15 @@
     <ColumnPicker :columns="columns" :pageid="pageid"
     v-if ="iscolpick" @close="iscolpick=false" @aplly="FetchColumnList"  ></ColumnPicker>
     </perfect-scrollbar>
+    <DetailTrend v-if="istrendshow" @close="istrendshow=false"></DetailTrend>
   </div>
 </template>
 
 <script>
 import {list,data} from '../api'
 import ColumnPicker from '../components/ColumnPicker'
-import DataView from './DataView'
+import DataView from '../components/DataView'
+import DetailTrend from '../components/DetailTrend'
 
 export default {
   name: 'ShipData',
@@ -290,12 +292,14 @@ export default {
     // ColumnPicker : ColumnPicker
     ColumnPicker,
     DataView,
+    DetailTrend,
   },
   data () {
     return{
       dates: [
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       ],
+      istrendshow:false,
       isalert:false,
       isscrollup:false,
       error:'',
@@ -377,6 +381,9 @@ export default {
     scrollTo(0,0)
   },
   methods:{
+    openDetailTrend(){
+      this.istrendshow = true
+    },
     MoveScroll(v){
       document.getElementById("footerbutton").scrollIntoView(v)
     },
