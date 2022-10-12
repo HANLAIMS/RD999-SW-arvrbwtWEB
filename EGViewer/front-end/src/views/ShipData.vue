@@ -271,11 +271,10 @@
       </v-btn>
 
     </v-card>
-    <perfect-scrollbar>
+    <DetailTrend v-if="istrendshow" @close="istrendshow=false"></DetailTrend>
     <ColumnPicker :columns="columns" :pageid="pageid"
     v-if ="iscolpick" @close="iscolpick=false" @aplly="FetchColumnList"  ></ColumnPicker>
-    </perfect-scrollbar>
-    <DetailTrend v-if="istrendshow" @close="istrendshow=false"></DetailTrend>
+    
   </div>
 </template>
 
@@ -460,7 +459,6 @@ export default {
       .then(datas => {
         this.operations.splice(0,this.operations.length)
         datas.list.forEach((data) => {
-          console.log(data)
           this.operations.push({
             name: data.operation_name,
             value: `${(data.total_operation_duration ? (data.total_operation_duration.days? data.total_operation_duration.days:0) : 0).toString()} day ${(data.total_operation_duration ? (data.total_operation_duration.hours? data.total_operation_duration.hours:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.minutes? data.total_operation_duration.minutes:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.seconds? data.total_operation_duration.seconds:0) : 0).toString().padStart(2,'0')}  (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`

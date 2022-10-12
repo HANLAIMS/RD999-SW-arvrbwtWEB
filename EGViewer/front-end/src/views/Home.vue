@@ -12,7 +12,9 @@
         cycle
         height="40vh"
         hide-delimiter-background
+        hide-delimiters
         show-arrows-on-hover
+        :show-arrows="false"
       >
         <v-carousel-item
           v-for="(slide, i) in slides"
@@ -79,7 +81,7 @@
                     class="rounded-vertex"
                     width="155"
                     height="155"
-                    color="#FFFFFF1A"
+                    color="#FFFFFF0A"
                   >
                     <v-sheet
                       color="#213A5B"

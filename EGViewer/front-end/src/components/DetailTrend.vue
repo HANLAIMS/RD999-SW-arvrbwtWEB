@@ -15,7 +15,7 @@
             color="transparent"
           >
             <v-app-bar-nav-icon></v-app-bar-nav-icon>
-            <v-toolbar-title>Detail trend-line {{pageid}}</v-toolbar-title>
+            <v-toolbar-title>{{tag}}</v-toolbar-title>
             <v-spacer></v-spacer>
             
             <v-btn
@@ -32,7 +32,8 @@
             :datasets="datasets"
             :grid="grid"
             :labels="labels"
-            :min="0"
+            :max="max"
+            :min="min"
             padding="5"
             :interactive="true"
             @mouse-move="onMouseMove"
@@ -60,8 +61,8 @@
       </form>
     </div>
     <div slot="footer">
-      <v-btn class="btn" type="submit" color="primary"
-        form="column-picker-form">print</v-btn>
+      <!-- <v-btn class="btn" type="submit" color="primary"
+        form="column-picker-form">print</v-btn> -->
     </div>
   </Modal>
 </template>
@@ -70,23 +71,22 @@
   import Modal from './Modal'
   import Popper from "popper.js";
   export default {
-    name: 'ColumnPicker',
-    props : {
-      columns : Array,
-      pageid : String,
-    },
+    name: 'DetailTrend',
     components:{
       Modal,
     },
     data: () => ({
       loading: false,
+      tag:null,
+      min: null,
+      max: null,
       datasets: [
         {
           data: [70, 100, 400, 180, 100, 300, 500],
-          smooth: true,
-          showPoints: true,
+          smooth: false,
+          showPoints: false,
           fill: true,
-          className: "curve1"
+          className: "curve1",
         },
         // {
         //   data: [150, 300, 350, 100, 350, 100, 15],
@@ -110,8 +110,8 @@
       labels: {
         zLabels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         xLabels: ["2022-10-11 00:00:00", "", "", "", "", "", "2022-10-11 07:00:00"],
-        yLabels: 11,
-        yLabelsTextFormatter: val => Math.round(val * 100) / 100
+        yLabels: 2,
+        yLabelsTextFormatter: val => Math.round(val * 1000) / 1000
       },
       tooltipData: null,
       popper: null,
@@ -120,19 +120,11 @@
     }),
 
     created(){
-      const storedItems = JSON.parse(localStorage.getItem(this.pageid))?JSON.parse(localStorage.getItem(this.pageid)):this.columns;
-      storedItems.forEach((storedItem) =>{
-        const columnItem = this.columns.find(v=>v.column_name === storedItem.column_name)
-        this.selected.push(columnItem)
-      })
-
-      this.input = ''
-      this.selected.forEach(element => {
-        this.input += `,${element.column_name}`
-      });
+      this.fetchData()
     },
     mounted() {
       this.initPopper()
+      
     },
 
     methods: {
@@ -153,6 +145,29 @@
       close() {
         this.$emit('close')
       },
+      fetchData() {
+        this.tag = this.$store.state.trendDataset.tag
+        this.datasets[0].data = JSON.parse(this.$store.state.trendDataset.values)
+        console.log(this.datasets.data)
+        this.labels.zLabels = JSON.parse(this.$store.state.trendDataset.labels)
+        this.labels.xLabels = JSON.parse(this.$store.state.trendDataset.labels)
+
+        
+        this.labels.zLabels.forEach((element,i) => {
+          this.labels.zLabels[i] = `${new Date(this.labels.zLabels[i]).toLocaleDateString()} ${new Date(element).getHours()}:${new Date(element).getMinutes()}:${String(new Date(element).getSeconds()).padStart(2,'0')}`
+        });
+
+        const lastIndex = this.labels.xLabels.length - 1
+        this.labels.xLabels.forEach((element,i) => {
+          if (i !=0 && i != lastIndex)
+            this.labels.xLabels[i] = ""
+          else
+            this.labels.xLabels[i] = `${new Date(element).getMonth()}/${new Date(element).getDay()} ${new Date(element).getHours()}:${new Date(element).getMinutes()}`
+        });
+
+        this.max = Math.max(...this.datasets[0].data)
+        this.min = Math.min(...this.datasets[0].data)>0? 0:Math.min(...this.datasets[0].data)
+      },
       initPopper() {
         const chart = document.querySelector(".random-chart");
         const ref = chart.querySelector(".active-line");
@@ -171,7 +186,6 @@
         this.popperIsActive = !!params;
         this.popper.scheduleUpdate();
         this.tooltipData = params || null;
-        console.log(this.tooltipData)
       }
     },
   }
@@ -208,7 +222,7 @@
     }
     .fill {
       fill: #fbac91;
-      opacity: 0.05;
+      opacity: 0.15;
     }
     .point {
       fill: #fbac91;

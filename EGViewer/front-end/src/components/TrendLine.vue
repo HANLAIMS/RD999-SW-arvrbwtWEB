@@ -56,7 +56,7 @@
 							<v-btn
 								block
 								text
-								@click="openDialog"
+								@click="openDialog(n-1)"
 							>
 								Go to detail
 							</v-btn>
@@ -67,7 +67,7 @@
 
     </div>
   </template>
-  
+
   <script>
 
   export default {
@@ -116,13 +116,22 @@
 				setTimeout(() => {
 					this.setValue()
 				}, 300);
-      }
+      },
+			selectedItem(){
+				localStorage.setItem('ViewPerLine',JSON.stringify(this.selectedItem))
+			}
     },
     mounted() {
+			if (JSON.parse(localStorage.getItem('ViewPerLine')) != null)
+				this.selectedItem = JSON.parse(localStorage.getItem('ViewPerLine'))
     },
     methods: {
-			openDialog(){
+			openDialog(index){
 				this.$emit('openDetailTrend')
+				this.$store.commit('UPDATE_VALUES',JSON.stringify(this.columns.value[index]))
+				this.$store.commit('UPDATE_LABELS',JSON.stringify(this.columns.datetime[index]))
+				this.$store.commit('UPDATE_VISIBLE',true)
+				this.$store.commit('UPDATE_TAG',this.columns.name[index])
 			},
 			setValue() {
         this.columns.name.splice(0,this.columns.name.length)
@@ -131,7 +140,7 @@
 				this.columns.label.splice(0,this.columns.datetime.length)
 
         this.keyData.forEach((header,i)=>{
-					this.columns.name.push(header.column_name)
+					this.columns.name.push(header.meta_alias)
 					this.columns.value.push([])
 					this.columns.datetime.push([])
 					this.columns.label.push([])
@@ -146,7 +155,7 @@
 								j == 3*Math.round(this.queryData.list.length/6) ||
 								j == 4*Math.round(this.queryData.list.length/6) ||
 								j == 5*Math.round(this.queryData.list.length/6) ||
-								j == this.queryData.list.length - 1 
+								j == this.queryData.list.length - 1
 						)
 						this.columns.label[i].push((Math.round(row[header.column_name]*1000)/1000))
 						else
@@ -159,7 +168,7 @@
     },
   };
   </script>
-  
+
   <style lang="scss">
   ::-moz-selection {
     color: #2c3e50;

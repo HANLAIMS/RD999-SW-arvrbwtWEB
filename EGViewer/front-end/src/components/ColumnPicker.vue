@@ -15,7 +15,7 @@
             color="transparent"
           >
             <v-app-bar-nav-icon></v-app-bar-nav-icon>
-            <v-toolbar-title>Filter Setting {{pageid}}</v-toolbar-title>
+            <v-toolbar-title>Filter Setting</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn
               icon
