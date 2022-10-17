@@ -118,7 +118,7 @@
                       >
                       <v-icon
                             :disabled="loading"
-                            v-text="`mdi-tag-plus`"
+                            v-text="`mdi-tag-outline`"
                         ></v-icon>
                       </v-btn>
                     </v-list-item-action>

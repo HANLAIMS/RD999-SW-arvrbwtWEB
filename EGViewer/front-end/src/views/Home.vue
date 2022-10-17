@@ -89,7 +89,7 @@
                       rounded="true"
                     >
                       <v-card-text style="color:white; font-size:large;padding-top:25px">
-                        총 설치 척수
+                        합계
                       </v-card-text>
                     </v-sheet>
                     <v-sheet
@@ -98,7 +98,7 @@
                       rounded="true"
                     >
                       <v-card-text style="color:white; font-size:large;padding-top:40px">
-                        {{total_result}}척
+                        {{totalValue}}척
                       </v-card-text>
                     </v-sheet>
                   </v-card>
@@ -120,7 +120,7 @@
                         class="rounded-vertex"
                         width="155"
                         height="155"
-                        color="#FFFFFF1A"
+                        color="#FFFFFF0A"
                       >
                         <v-sheet
                           color="#213A5B"
@@ -237,7 +237,6 @@ export default {
           text: `세계 최고의 그 날까지<br/>한라IMS는 최선을 다하겠습니다.`,
         },   
       ],
-      total_result: 72,
       annual_results:[
         {
           year: '2020',
@@ -276,7 +275,13 @@ export default {
        this.fetchData()
   },
   computed:{
-    
+    totalValue() {
+      let totalValue = 0
+      this.annual_results.forEach((element)=>{
+        totalValue += element.result
+      })
+      return totalValue
+    }
   },
   methods: {
     fetchData() {

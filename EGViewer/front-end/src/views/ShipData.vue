@@ -1,5 +1,13 @@
 <template>
   <div class="shipdata">
+    <div class="gotoshiplist">
+      <router-link :to="`/ship-list`" tag = 'button'>
+        <v-btn color="primary" text>
+          <v-icon>mdi-arrow-left-bold</v-icon>
+          SHIP LIST
+        </v-btn>
+      </router-link>
+    </div>
     <v-card
     :loading="loading"
     class="mx-auto my-card"
@@ -33,8 +41,22 @@
       </div>
       <v-list-item two-line>
         <v-list-item-content>
-          <v-list-item-title class="text-h5 text-left">{{shipName}}</v-list-item-title>
-          <v-list-item-subtitle class="text-left" >{{shipid}}</v-list-item-subtitle>
+          <v-list-item-title class="text-h5 text-left">
+            {{shipName}}
+          </v-list-item-title>
+          
+          <v-list-item-subtitle class="text-left" >
+            IMO: {{shipid}} 
+            <a :href="`https://www.marinetraffic.com/en/ais/details/ships/imo:${shipid}`"
+              target='_blank'
+              style="text-decoration:none; color:white;"
+            >
+              <v-icon size="20px">
+                {{ 'mdi-map-search-outline' }}
+              </v-icon>
+            </a>
+          </v-list-item-subtitle>
+          
         </v-list-item-content>
       </v-list-item>
 
@@ -65,7 +87,7 @@
             :key="operation.name"
           >
             <v-list-item-subtitle class="text-left" style="text-transform:uppercase">{{operation.name}}-MODE</v-list-item-subtitle>
-            <v-list-item-subtitle class="text-right" style="color:royalblue; white-space: pre;;">{{operation.value}}</v-list-item-subtitle>
+            <v-list-item-subtitle class="text-left" style="color:royalblue; white-space: pre;">{{operation.value}}</v-list-item-subtitle>
           </v-list-item>
       </v-card-text>
 
@@ -80,7 +102,19 @@
               active-class="primary accent-4 white--text"
               column
           >
-            <v-icon>mdi-ship-wheel</v-icon>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon 
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-ship-wheel
+                </v-icon>
+              </template>
+              <span>
+                <div class="hint">Select the operation type</div> 
+              </span>
+            </v-tooltip>
             <div 
               v-for="opmode in opmodes"
               :key="opmode.name"
@@ -89,18 +123,43 @@
             </div>
             <v-chip @click="InitViewType" style="text-transform:capitalize" label >Alarm</v-chip>
           </v-chip-group>
-          
+          <v-spacer></v-spacer>
           <v-chip-group
               v-model="viewtype"
               active-class="primary accent-4 white--text"
               column
           >
-            <v-icon >mdi-database-eye-outline</v-icon>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon 
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  mdi-database-eye-outline
+                </v-icon>
+              </template>
+              <span>
+                <div class="hint">Select the visualization type</div> 
+              </span>
+            </v-tooltip>
             <v-chip style="text-transform:capitalize" label>Sheet</v-chip>
             <v-chip style="text-transform:capitalize" label>Trend line</v-chip>            
             <v-chip style="text-transform:capitalize" label>Average</v-chip>
           </v-chip-group>
-          <v-icon >mdi-filter-settings-outline</v-icon>
+          <v-spacer></v-spacer>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon 
+                v-bind="attrs"
+                v-on="on"
+              >
+              mdi-filter-settings-outline
+              </v-icon>
+            </template>
+            <span>
+              <div class="hint">Select tags to activate</div> 
+            </span>
+          </v-tooltip>
           <v-chip style="text-transform:capitalize" label @click="ClickFilterSet">...</v-chip>
         </v-list-item>
 
@@ -122,7 +181,7 @@
                 multiple
                 chips
                 small-chips
-                label="Multiple picker in menu"
+                label="Multiple dates picker in menu"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -130,6 +189,7 @@
                 @click="MoveScroll(false)"
               ></v-combobox>
             </template>
+
             <v-date-picker
               v-model="dates"
               range
@@ -146,12 +206,13 @@
               <v-btn
                 text
                 color="primary"
-                @click="$refs.menu.save(dates)"
+                @click="$refs.menu.save(dates),VerifyDuplication()"
               >
                 OK
               </v-btn>
             </v-date-picker>
           </v-menu>
+          <v-spacer></v-spacer>
           <!-- 시작시간 -->
           <v-menu
             ref="startpick"
@@ -194,6 +255,7 @@
               </v-btn>
             </v-time-picker>
           </v-menu>
+          <v-spacer></v-spacer>
           <!-- 종료시간 -->
           <v-menu
             ref="endpick"
@@ -239,34 +301,32 @@
         </v-list-item>
       </v-card-text>
 
-      <!-- <router-view></router-view> -->
       <v-card-actions id="footerbutton">
+        <v-spacer></v-spacer>
+
         <router-link :to="`/ship-data/${shipid}/data-view/${viewid}${selectedColString}`" tag = 'button'>
           <v-btn
-            color="primary lighten-2"
-            text
+            small
+            color="primary"
             @click="[ShowData(true),isscrollup=true]"
+            style="margin-right:10px"
           >
             View Detail
           </v-btn>
         </router-link>
-        <router-link :to="`/ship-list`" tag = 'button'>
-          <v-btn
-            color="primary lighten-2"
-            text
-          >
-            ship list
-          </v-btn>
-        </router-link>
       </v-card-actions>
 
-      <DataView :columns="selectedColumns" :shipid="shipid" @openDetailTrend="openDetailTrend"></DataView>
+      <DataView :columns="selectedColumns" :shipid="shipid" @openDetailTrend="OpenDetailTrend"></DataView>
       <v-btn
         color="primary lighten-2"
         text
         v-if="isscrollup"
         @click="ShowData(false)"
-      >
+        width="max"
+      > 
+        <v-icon dark>
+          mdi-stairs-up
+        </v-icon>
         Scroll-up
       </v-btn>
 
@@ -298,6 +358,7 @@ export default {
       dates: [
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       ],
+      scrollY: 0,
       istrendshow:false,
       isalert:false,
       isscrollup:false,
@@ -378,9 +439,18 @@ export default {
     this.FetchData()
     this.SetViewId()
     scrollTo(0,0)
+
+    window.addEventListener("scroll",this.handleScroll)
   },
   methods:{
-    openDetailTrend(){
+    handleScroll() {
+      this.scrollY = window.scrollY
+    },
+    VerifyDuration(){
+      if (this.dates.length==1&&this.startTime >= this.endTime)
+        console.log("dddd")
+    },
+    OpenDetailTrend(){
       this.istrendshow = true
     },
     MoveScroll(v){
@@ -461,7 +531,7 @@ export default {
         datas.list.forEach((data) => {
           this.operations.push({
             name: data.operation_name,
-            value: `${(data.total_operation_duration ? (data.total_operation_duration.days? data.total_operation_duration.days:0) : 0).toString()} day ${(data.total_operation_duration ? (data.total_operation_duration.hours? data.total_operation_duration.hours:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.minutes? data.total_operation_duration.minutes:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.seconds? data.total_operation_duration.seconds:0) : 0).toString().padStart(2,'0')}  (${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`
+            value: `${(data.total_operation_duration ? (data.total_operation_duration.days? data.total_operation_duration.days:0) : 0).toString()} day ${(data.total_operation_duration ? (data.total_operation_duration.hours? data.total_operation_duration.hours:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.minutes? data.total_operation_duration.minutes:0) : 0).toString().padStart(2,'0')} :${(data.total_operation_duration ? (data.total_operation_duration.seconds? data.total_operation_duration.seconds:0) : 0).toString().padStart(2,'0')}  ${data.min == null? '':`(${new Date(data.min).toLocaleDateString()}~${new Date(data.max).toLocaleDateString()})`}`
           })
         })
         
@@ -531,6 +601,12 @@ export default {
     margin-top:-10px;
     margin-bottom:-10px;
   }
-
+  .gotoshiplist{
+    position:fixed;
+    z-index:999;
+    width:15vw;
+    top:50vh;
+    height:100vh;
+  }
 
 </style>
