@@ -22,35 +22,42 @@
   </div>
   <div class="item">
     <div>Login</div>
-    <code>curl -X POST localhost:3000/login -d 'email=test@test.com&password=123123'</code>
+    <code>curl -X POST localhost:3000/pg-login -d 'email=test@test.com&password=123123'</code>
   </div>
 
   <hr />
 
   <div class="item">
-    <div>Get board list</div>
-    <code>curl localhost:3000/boards -H 'Authorization: Bearer token'</code>
+    <div>Get Ship list get all</div>
+    <code>curl localhost:3000/pg-shiplist -H 'Authorization: Bearer token'</code>
   </div>
   <div class="item">
-    <div>Get board</div>
-    <code>curl localhost:3000/boards/1 -H 'Authorization: Bearer token'</code>
-  </div>
-  <div class="item">
-    <div>Add board</div>
-    <code>curl -X POST localhost:3000/boards -H 'Authorization: Bearer token' -d "title=string"</code>
-  </div>
-  <div class="item">
-    <div>Edit board</div>
-    <code>curl -X PUT localhost:3000/boards/1 -H 'Authorization: Bearer token' -d "title=string&bgColor=string"</code>
-  </div>
-  <div class="item">
-    <div>Delete board</div>
-    <code>curl -X DELETE localhost:3000/boards/1 -H 'Authorization: Bearer token'"</code>
+    <div>Get Ship list get one</div>
+    <code>curl localhost:3000/pg-shiplist/:Ship-ID -H 'Authorization: Bearer token'</code>
   </div>
 
   <hr />
 
   <div class="item">
+    <div>Get Ship data on total of oprations</div>
+    <code>curl -X POST localhost:3000/pg-shipdata/:Ship-ID -H 'Authorization: Bearer token'</code>
+  </div>
+  <div class="item">
+    <div>Get Tag name according to operation mode</div>
+    <code>curl -X POST localhost:3000/pg-shipdata-getcol/:Ship-ID -H 'Authorization: Bearer token' -d "opmode=string"</code>
+  </div>
+  <div class="item">
+    <div>Get Data based on tag name and uptime</div>
+    <code>curl -X POST localhost:3000/pg-shipdata-opdata/:Ship-ID -H 'Authorization: Bearer token' -d "opmode=string,columnlist=string,startdate=string,enddate=string"</code>
+  </div>
+  <div class="item">
+    <div>Get Average data based on tag name and uptime</div>
+    <code>curl -X POST localhost:3000/pg-shipdata-avgopdata/:Ship-ID -H 'Authorization: Bearer token' -d "opmode=string,columnlist=string,startdate=string,enddate=string"</code>
+  </div>
+
+  <hr />
+
+  <!-- <div class="item">
     <div>Add list</div>
     <code>curl -X POST localhost:3000/lists -H 'Authorization: Bearer token' -d "title=string&boardId=number&pos=number"</code>
   </div>
@@ -80,7 +87,7 @@
   <div class="item">
     <div>Delete card</div>
     <code>curl -X DELETE localhost:3000/cards/1 -H 'Authorization: Bearer token'</code>
-  </div>
+  </div> -->
 
 </body>
 </html>
