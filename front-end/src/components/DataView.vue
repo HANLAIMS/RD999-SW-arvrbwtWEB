@@ -92,7 +92,6 @@ export default {
             this.columns.forEach(element => {
               this.columsString += `,${element.column_name}`
             })
-
             data.fetchRecord(this.shipid,this.mode,this.columsString,this.startTime,this.endTime)
             .then(data => {
               this.queryData = data

@@ -4,26 +4,26 @@ networks:
   my-network:
     driver: bridge
 services:
-  pg-0:
+  pg-1:
     image: bitnami/postgresql-repmgr:13.4.0
     
     ports:
       - 5440:5432
     volumes:
-      - pg_0_extention:/opt/bitnami/postgresql/share/extension
-      - pg_0_data:/bitnami/postgresql
-      - 'd:/arvr/postgresql/repmgr_0:/opt/bitnami/repmgr/tmp'
+      - pg_1_extention:/opt/bitnami/postgresql/share/extension
+      - pg_1_data:/bitnami/postgresql
+      - 'd:/arvr/postgresql/repmgr_1:/opt/bitnami/repmgr/tmp'
     environment:
       - POSTGRESQL_POSTGRES_PASSWORD=postgres
       - POSTGRESQL_USERNAME=postgres
       - POSTGRESQL_PASSWORD=hanlaims
       - POSTGRESQL_DATABASE=postgres
       - REPMGR_PASSWORD=repmgr
-      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PRIMARY_HOST=pg-1
       - REPMGR_PRIMARY_PORT=5432
-      - REPMGR_PARTNER_NODES=pg-0,pg-1
-      - REPMGR_NODE_NAME=pg-0
-      - REPMGR_NODE_NETWORK_NAME=pg-0
+      - REPMGR_PARTNER_NODES=pg-1,pg-0
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
   back-end:
     build: ./back-end
     volumes: ./back-end:/usr/src/app
@@ -33,11 +33,11 @@ services:
     volumes: ./front-end:/usr/src/app
     port: 8080:8080
 volumes:
-  pg_0_data:
+  pg_1_data:
     driver: local
   # pg_1_data:
   #   driver: local
-  pg_0_extention:
+  pg_1_extention:
     driver: local
   # pg_1_extention:
   #   driver: local

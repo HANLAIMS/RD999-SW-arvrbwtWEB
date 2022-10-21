@@ -194,6 +194,7 @@
         const storedItems = JSON.parse(localStorage.getItem(this.pageid))?JSON.parse(localStorage.getItem(this.pageid)):this.columns;
         storedItems.forEach((storedItem) =>{
           const columnItem = this.columns.find(v=>v.column_name === storedItem.column_name)
+          if (columnItem != null)
           this.selected.push(columnItem)
         })
 

@@ -206,7 +206,7 @@
               <v-btn
                 text
                 color="primary"
-                @click="$refs.menu.save(dates),VerifyDuplication()"
+                @click="$refs.menu.save(dates)"
               >
                 OK
               </v-btn>
@@ -446,10 +446,6 @@ export default {
     handleScroll() {
       this.scrollY = window.scrollY
     },
-    VerifyDuration(){
-      if (this.dates.length==1&&this.startTime >= this.endTime)
-        console.log("dddd")
-    },
     OpenDetailTrend(){
       this.istrendshow = true
     },
@@ -547,8 +543,18 @@ export default {
         this.selectedColumns = localStorage.getItem(this.pageid)? JSON.parse(localStorage.getItem(this.pageid)):this.columns
 
         this.selectedColString = ''         
-        this.selectedColumns.forEach((element)=>{
-          this.selectedColString+=`,${element.column_name}`
+        const notfoundindexs = []
+        this.selectedColumns.forEach((element,i)=>{
+          const columnItem = this.columns.find(v=>v.column_name === element.column_name)
+          if (columnItem != null)
+          {
+            this.selectedColString+=`,${element.column_name}`
+          }
+          else
+            notfoundindexs.push(i)
+        })
+        notfoundindexs.forEach(i=>{
+          this.selectedColumns.splice(i,1)
         })
       })
       .catch(res=>{
