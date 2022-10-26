@@ -4,13 +4,23 @@ networks:
   my-network:
     driver: bridge
 services:
+  back-end:
+    build: ./back-end
+    volumes: 
+    - ./back-end:/home/node/app
+    ports: 
+    - 3000:3000
+  front-end:
+    build: ./front-end
+    volumes: 
+    - ./front-end:/home/node/app
+    ports: 
+    - 8081:8080
   pg-0:
     image: bitnami/postgresql-repmgr:13.4.0
-    
     ports:
       - 5440:5432
     volumes:
-      - pg_0_extention:/opt/bitnami/postgresql/share/extension
       - pg_0_data:/bitnami/postgresql
       - 'd:/arvr/postgresql/repmgr_0:/opt/bitnami/repmgr/tmp'
     environment:
@@ -20,144 +30,27 @@ services:
       - POSTGRESQL_DATABASE=postgres
       - REPMGR_PASSWORD=repmgr
       - REPMGR_PRIMARY_HOST=pg-0
-      - REPMGR_PRIMARY_PORT=5432
       - REPMGR_PARTNER_NODES=pg-0,pg-1
       - REPMGR_NODE_NAME=pg-0
       - REPMGR_NODE_NETWORK_NAME=pg-0
-  back-end:
-    build: ./back-end
-    volumes: ./back-end:/usr/src/app
-    port: 3000:3000
-  front-end:
-    build: ./front-end
-    volumes: ./front-end:/usr/src/app
-    port: 8080:8080
+  pgpool:
+    image: bitnami/pgpool:4
+    ports:
+      - 5442:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:192.168.1.128:5440,1:192.168.1.128:5441
+      - PGPOOL_SR_CHECK_USER=repmgr
+      - PGPOOL_SR_CHECK_PASSWORD=repmgr
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=hanlaims
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 volumes:
   pg_0_data:
     driver: local
-  # pg_1_data:
-  #   driver: local
-  pg_0_extention:
-    driver: local
-  # pg_1_extention:
-  #   driver: local
-  # pg-1:
-  #   image: bitnami/postgresql-repmgr:13.4.0
-  #   ports:
-  #     - 5441:5432
-  #   volumes:
-  #     - pg_1_extention:/opt/bitnami/postgresql/share/extension
-  #     - pg_1_data:/bitnami/postgresql
-  #     - 'c:/ams/postgresql/repmgr_1:/opt/bitnami/repmgr/tmp'
-  #   environment:
-  #     - POSTGRESQL_POSTGRES_PASSWORD=postgres
-  #     - POSTGRESQL_USERNAME=hanla
-  #     - POSTGRESQL_PASSWORD=hanla
-  #     - POSTGRESQL_DATABASE=postgres
-  #     - REPMGR_PASSWORD=repmgr
-  #     - REPMGR_PRIMARY_HOST=pg-0
-  #     - REPMGR_PRIMARY_PORT=5432
-  #     - REPMGR_PARTNER_NODES=pg-0,pg-1
-  #     - REPMGR_NODE_NAME=pg-1
-  #     - REPMGR_NODE_NETWORK_NAME=pg-1
-  # pgpool:
-  #   image: bitnami/pgpool:4
-  #   ports:
-  #     - 5442:5432
-  #   environment:
-  #     - PGPOOL_BACKEND_NODES=0:192.168.0.101:5432,1:192.168.0.102:5432
-  #     - PGPOOL_SR_CHECK_USER=postgres
-  #     - PGPOOL_SR_CHECK_PASSWORD=hanla
-  #     - PGPOOL_SR_CHECK_DATABASE=postgres
-  #     - PGPOOL_ENABLE_LDAP=no
-  #     - PGPOOL_POSTGRES_USERNAME=postgres
-  #     - PGPOOL_POSTGRES_PASSWORD=hanla
-  #     - PGPOOL_ADMIN_USERNAME=admin
-  #     - PGPOOL_ADMIN_PASSWORD=adminpassword
-  #   healthcheck:
-  #     test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
-  #     interval: 5s
-  #     timeout: 3s
-  #     retries: 1
-# volumes:
-#   pg_0_data:
-#     driver: local
-#   # pg_1_data:
-#   #   driver: local
-#   pg_0_extention:
-#     driver: local
-# #   # pg_1_extention:
-# #   #   driver: local
-
-
-# version: '2'
-
-# networks:
-#   my-network:
-#     driver: bridge
-# services:
-#   pg-0:
-#     image: bitnami/postgresql-repmgr:13.4.0
-#     ports:
-#       - 5440:5432
-#     volumes:
-#       - pg_0_data:/bitnami/postgresql
-#     environment:
-#       - POSTGRESQL_POSTGRES_PASSWORD=postgres
-#       - POSTGRESQL_USERNAME=hanla
-#       - POSTGRESQL_PASSWORD=hanla
-#       - POSTGRESQL_DATABASE=hanla
-#       - REPMGR_PASSWORD=repmgr
-#       - REPMGR_PRIMARY_HOST=pg-0
-#       - REPMGR_PARTNER_NODES=pg-0,pg-1
-#       - REPMGR_NODE_NAME=pg-0
-#       - REPMGR_NODE_NETWORK_NAME=pg-0
-#   pg-1:
-#     image: bitnami/postgresql-repmgr:13.4.0
-#     ports:
-#       - 5441:5432
-#     volumes:
-#       - pg_1_data:/bitnami/postgresql
-#     environment:
-#       - POSTGRESQL_POSTGRES_PASSWORD=postgres
-#       - POSTGRESQL_USERNAME=hanla
-#       - POSTGRESQL_PASSWORD=hanla
-#       - POSTGRESQL_DATABASE=hanla
-#       - REPMGR_PASSWORD=repmgr
-#       - REPMGR_PRIMARY_HOST=pg-0
-#       - REPMGR_PARTNER_NODES=pg-0,pg-1
-#       - REPMGR_NODE_NAME=pg-1
-#       - REPMGR_NODE_NETWORK_NAME=pg-1
-#   pgpool:
-#     image: bitnami/pgpool:4
-#     ports:
-#       - 5442:5432
-#     environment:
-#       - PGPOOL_BACKEND_NODES=0:pg-0:5432,1:pg-1:5432
-#       - PGPOOL_SR_CHECK_USER=hanla
-#       - PGPOOL_SR_CHECK_PASSWORD=hanla
-#       - PGPOOL_SR_CHECK_DATABASE=hanla
-#       - PGPOOL_ENABLE_LDAP=yes
-#       - PGPOOL_POSTGRES_USERNAME=hanla
-#       - PGPOOL_POSTGRES_PASSWORD=hanla
-#       - PGPOOL_ADMIN_USERNAME=admin
-#       - PGPOOL_ADMIN_PASSWORD=adminpassword
-#     healthcheck:
-#       test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
-#       interval: 10s
-#       timeout: 3s
-#       retries: 2
-# volumes:
-#   pg_0_data:
-#     driver: local
-#   pg_1_data:
-#     driver: local
-
-# 도커 볼륨 백업
-# docker run --volumes-from postgres2_postgres-master_1 -v c:/backup:/backup ubuntu tar cvf /backup/backup.tar /bitnami/postgresql
-# docker run --volumes-from postgres2_postgres-master_1 --name volumes_backup -v c:/backup:/backup ubuntu tar cvf /backup/backup.tar /bitnami/postgresql 
-# 도커 볼륨 복원
-# docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /dbdata && tar xvf /backup/backup.tar --strip 1"
-# docker run --rm --volumes-from postgres3_postgres-master_1 -v c:/backup:/backup ubuntu bash -c "cd /bitnami/postgresql && tar xvf /backup/backup.tar --strip 2"
-# 도커 repmgr.conf 보기
-# docker exec postgres3_pg-1_1 /opt/bitnami/scripts/postgresql-repmgr/entrypoint.sh repmgr cluster show -f /opt/bitnami/repmgr/conf/repmgr.conf

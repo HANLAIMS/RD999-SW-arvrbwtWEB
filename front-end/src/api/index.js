@@ -29,7 +29,7 @@ if (token) setAuthInHeader(token)
 
 export const dashboard = {
     fetch() {
-        return request('get','/boards')
+        return request('get','/pg-dashboards')
     }
 }
 export const auth = {
